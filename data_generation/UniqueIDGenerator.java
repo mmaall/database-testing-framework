@@ -13,12 +13,15 @@ import java.net.InetAddress;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.lang.Math;
+import java.util.UUID;
+
 
 // Static class that generates some unique identifiers
 class UniqueIDGenerator{
 
 
     private static final int SIZE_OF_INT = 4;
+    private static final int SIZE_OF_LONG = 8;
     private static final int SIZE_OF_BYTE = 1;
 
     // Holds the unique system identifier
@@ -96,14 +99,17 @@ class UniqueIDGenerator{
 
     }
 
-    public int getUID(){
-        UID id = new UID();
-        int uidHash = id.hashCode();
+    public long getUID(){
 
-        System.out.println("uidHash: "+ uidHash);
+        UUID id = UUID.randomUUID();
+        // uid is going to be the least significant bits of the uid
+        long uidHash = id.getLeastSignificantBits();
+        String uidString = id.toString();
+        //System.out.println("uidHash: "+ uidHash);
+        //System.out.println("Uid string: " + uidString);
         int numReservedBits = processBits + systemBits;
-        int totalBitsInt = SIZE_OF_INT * 8; 
-        int topBitMask = (int) Math.pow(2, totalBitsInt - numReservedBits) - 1; 
+        int totalBitsLong = SIZE_OF_LONG * 8; 
+        long topBitMask = (long) Math.pow(2, totalBitsLong - numReservedBits) - 1; 
         //System.out.println("Top Bit Mask: " + topBitMask);
         
         // Mask out the top bits to 0s 
@@ -121,7 +127,7 @@ class UniqueIDGenerator{
         topBitMask = topBitMask | processIdentifier;
 
         //shift to apply to top bits
-        topBitMask = topBitMask << totalBitsInt - numReservedBits;
+        topBitMask = topBitMask << totalBitsLong - numReservedBits;
 
         // System.out.println("Mask application: "+topBitMask);
         
