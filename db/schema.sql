@@ -4,25 +4,25 @@ CREATE DATABASE IF NOT EXISTS rocks_db_test_db;
 USE rocks_db_test_db;
 
 CREATE TABLE customers(
-    customer_id     INT PRIMARY KEY,
+    customer_id     BIGINT PRIMARY KEY,
     name            VARCHAR(50),
     address         VARCHAR(125),
     age             INT
 );
 
 CREATE TABLE products(
-    product_id      INT PRIMARY KEY,
-    name            VARCHAR(100), 
+    product_id      BIGINT PRIMARY KEY,
+    name            VARCHAR(75), 
     category        VARCHAR(50),
-    price           DECIMAL(15,2),
-    description     VARCHAR(5000),
+    price           DECIMAL(15,4),
+    description     VARCHAR(1000),
     posting_date    DATE 
 );
 
 CREATE TABLE orders(
-    order_id        INT PRIMARY KEY,
-    customer_id     INT,
-    product_id      INT,
+    order_id        BIGINT PRIMARY KEY,
+    customer_id     BIGINT,
+    product_id      BIGINT,
     quantity        INT,
-    purchase_time   DATETIME
+    purchase_time   TIMESTAMP 
 );
