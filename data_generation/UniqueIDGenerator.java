@@ -8,10 +8,6 @@
  * unique identifiers for tests. Please do not use this for anything important.
 **/
 
-import java.rmi.server.UID;
-import java.net.InetAddress; 
-import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.lang.Math;
 import java.util.UUID;
 
@@ -44,21 +40,12 @@ class UniqueIDGenerator{
     private int maxSystemID = (int) Math.pow(2, systemBits); 
 
 
-    // Default constructur is going to use the ip address to derive the
-    // system identifier
-
-    //TODO: This doesn't work 
+    // Default constructor
+    // Uses a process ID of 0 and system identifier of 0  
     public UniqueIDGenerator(){
         // Finds the ipAddress so we only have to do it once  
-        try{
-            final DatagramSocket socket = new DatagramSocket();
-            socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
-            systemIdentifier = (byte) socket.getLocalAddress().hashCode();
-        }
-        catch(Exception e){
-            System.out.printf("Unknown address\n");
-            System.out.printf("%s\n", e.toString());
-        }
+        systemIdentifier = 0;
+        processIdentifier = 0;
 
     }
 
