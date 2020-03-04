@@ -11,7 +11,7 @@ class StringGenerator{
                                            "            ";
 
     //Generate a string of a given length 
-    public static String generateString(int length){
+    public static String generateAlphaNumeric(int length){
 
         String output = "";
         int numCharacters = validCharacters.length();
@@ -21,6 +21,28 @@ class StringGenerator{
             char newChar = validCharacters.charAt((int) (Math.random()*numCharacters));
             output+= newChar;
         } 
+        return output;
+    }
+
+    // Generates a string that is going to be a decimal number
+    public static String generateDecimal(int leftOfDecimal, int rightOfDecimal){
+        String output = "";
+
+        for (int i= 0; i< leftOfDecimal; i++){
+            int digit =  (int) (Math.random()*10);
+            output += digit;
+        }
+
+
+        if(rightOfDecimal > 0){
+            output += ".";
+        }
+
+        for (int i= 0; i< rightOfDecimal; i++){
+            int digit = (int) (Math.random()*10);
+            output += digit; 
+        }
+
         return output;
     }
 }
