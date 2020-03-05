@@ -2,6 +2,7 @@
 import static java.nio.file.StandardOpenOption.*;
 import java.nio.file.*;
 import java.io.*;
+import java.time.LocalDate;
 
 
 class DataGenerator{
@@ -50,7 +51,7 @@ class DataGenerator{
                                     {"purchase_time", TIMESTAMP}
                                   };
 
-        generateFile("testFile", 10, "customers", customerInfo, null, null);
+        generateFile("testFile", 10, "products", productInfo, null, null);
     }
 
 
@@ -120,19 +121,27 @@ class DataGenerator{
                             long key = generator.getUID();
                             outputStr += key;
                         }
-                        
+
                         else if (type == INT){
                             int maxValue = (int) tableInfo[i][2];
                             int randomValue = (int) (Math.random()*maxValue);
                             outputStr += randomValue; 
                         }
                         else if (type == VARCHAR){
+                            int numCharacters = (int) tableInfo[i][2];
 
+                            //Varachars have a variance of 30 characters. 
+                            outputStr += StringGenerator.generateAlphaNumeric(numCharacters, 30);
                         }
                         else if (type == DECIMAL){
+                            int leftOfDecimal = (int) tableInfo[i][2];
+                            int rightOfDecimal = (int) tableInfo[i][3];
 
+                            outputStr += StringGenerator.generateDecimal(leftOfDecimal, rightOfDecimal); 
                         }
                         else if (type == DATE){
+                            outputStr += createRandomDate(2010,2019).toString();
+
 
                         }
                         else if (type == TIMESTAMP){
@@ -173,6 +182,25 @@ class DataGenerator{
 
 
         return null;
+    }
+
+
+    /**
+     * Borrowed this from the internet
+     * Wasn't in the mood to write it myself. Thanks internet, you do great. 
+     * src: https://www.logicbig.com/how-to/code-snippets/jcode-java-random-random-dates.html
+     *
+    **/
+
+    public static int createRandomIntBetween(int start, int end) {
+        return start + (int) Math.round(Math.random() * (end - start));
+    }
+
+    public static LocalDate createRandomDate(int startYear, int endYear) {
+        int day = createRandomIntBetween(1, 28);
+        int month = createRandomIntBetween(1, 12);
+        int year = createRandomIntBetween(startYear, endYear);
+        return LocalDate.of(year, month, day);
     }
 
 }
