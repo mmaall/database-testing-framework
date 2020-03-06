@@ -10,11 +10,20 @@ class StringGenerator{
                                            "0123456789"+
                                            "            ";
 
-    //Generate a string of a given length 
-    public static String generateAlphaNumeric(int length){
+    //Generate a string of a given length
+
+    // Lost characters are how many characters we are willing to lose. A zero means
+    // That the string will be fully the length specified.  
+    public static String generateAlphaNumeric(int length, int lostCharacters){
 
         String output = "";
         int numCharacters = validCharacters.length();
+
+        if (lostCharacters >= length){
+            lostCharacters = 0;
+        }
+
+        length = length - (int) (Math.random() * lostCharacters);
 
         for (int i =0; i< length; i++){
 
