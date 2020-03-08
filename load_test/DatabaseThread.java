@@ -1,30 +1,64 @@
+import java.sql.*;
+
+
+
 class DatabaseThread extends Thread{
     // Name of the thread  
     private String threadName;
     private int count;
+    private String dbUrl;
+    private Connection conn;
+    private final String dbName = "rocks_db_test_db"; 
+
+
+    private PreparedStatement findCustomerByUID; 
+
 
     //Constructor  
-    DatabaseThread( String name) {
+    DatabaseThread(String name, String databaseUrl) {
+        System.out.println("Creating " +  name);
         threadName = name;
-        System.out.println("Creating " +  threadName );
+        dbUrl = databaseUrl; 
+       
+        // Set up connection
+        try{
+            conn = DriverManager.getConnection(dbUrl);
+        }
+        catch(SQLException e){
+            System.err.println("ERROR: Unable to connect to " + dbUrl);
+            System.err.println(e.toString());
+        }
+
+        // Statement test
+         
     }
 
      
     public void run() {
-        System.out.println("Running " +  threadName );
+        System.out.println("Running " +  threadName);
+        Statement stmt = null;
+        ResultSet rs = null;
+
         try {
-            for(int i = 4; i > 0; i--) {
-                System.out.println("Thread: " + threadName + ", " + i);
-                //Add to our count  
-                count++; 
-                // Let the thread sleep for a while.
-                Thread.sleep(1);
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery("SELECT * FROM customers");
+
+
+            while (rs.next()){
+                System.out.println(rs.getLong(1));
             }
+            // or alternatively, if you don't know ahead of time that
+            // the query will be a SELECT...
+
+            // Now do something with the ResultSet ....
+        }
+        catch (SQLException ex){
+            // handle any errors
+            System.out.println("SQLException: " + ex.getMessage());
+            System.out.println("SQLState: " + ex.getSQLState());
+            System.out.println("VendorError: " + ex.getErrorCode());
         }
 
-        catch (InterruptedException e) {
-            System.out.println("Thread " +  threadName + " interrupted.");
-        }
 
         System.out.println("Thread " +  threadName + " exiting.");
     }

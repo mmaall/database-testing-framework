@@ -2,7 +2,21 @@
 class TestDriver{
 
     public static void main(String args[]){
-        DatabaseThread dbThread1 = new DatabaseThread("thread1");
+        
+
+
+
+        // Database info
+
+        String databaseUrl = "jdbc:mysql://localhost/rocks_db_test_db";
+        String userName = "michael";
+        String password = "m2lanthier";
+
+
+        String fullUrl = databaseUrl+"?user="+userName+"&password="+password;
+
+
+        DatabaseThread dbThread1 = new DatabaseThread("thread1", fullUrl);
         dbThread1.start();
         System.out.println("Is thread alive? " + dbThread1.isAlive());
         
