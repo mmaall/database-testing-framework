@@ -42,8 +42,9 @@ class DataGenerator{
                                     {"product_id", BIGINT}, 
                                     {"name", VARCHAR, 50},
                                     {"category", VARCHAR, 125},
-                                    {"price", DECIMAL, 15, 2},
+                                    {"price", DECIMAL, 4, 2},
                                     {"description", VARCHAR, 1000},
+                                    {"quantity", INT, 500000},
                                     {"posting_date", DATE}
                                   };
 
@@ -51,7 +52,7 @@ class DataGenerator{
                                     {"order_id", BIGINT}, 
                                     {"customer_id", BIGINT},
                                     {"product_id", BIGINT},
-                                    {"quantity", INT, 10000},
+                                    {"quantity", INT, 100},
                                     {"purchase_time", TIMESTAMP}
                                   };
 
@@ -252,7 +253,7 @@ class DataGenerator{
                 byte[] outputBytes = outputString.getBytes();
 
                 out.write(outputBytes, 0, outputBytes.length);
-                
+
                 if (totalRecordsGenerated % 100000 == 0){
                     System.out.println("Total Records Generated: "+totalRecordsGenerated);
                 }
