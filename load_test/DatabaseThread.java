@@ -27,10 +27,22 @@ class DatabaseThread extends Thread{
         catch(SQLException e){
             System.err.println("ERROR: Unable to connect to " + dbUrl);
             System.err.println(e.toString());
+            System.exit(-1);
         }
 
-        // Statement test
-         
+        // Prepare Statements
+
+        String findCustomerByUID_str = "SELECT * FROM customers WHERE customer_id = ?";
+
+
+        try{
+            findCustomerByUID = conn.prepareStatement(findCustomerByUID_str);
+
+        }
+        catch(Exception e){
+            System.err.println("ERROR: Unable to set up prepared statements");
+            System.err.println(e.toString());
+        }
     }
 
      
@@ -40,6 +52,8 @@ class DatabaseThread extends Thread{
         ResultSet rs = null;
 
         try {
+
+            System.out.println("Test Select");
             stmt = conn.createStatement();
             rs = stmt.executeQuery("SELECT * FROM customers");
 
@@ -47,10 +61,17 @@ class DatabaseThread extends Thread{
             while (rs.next()){
                 System.out.println(rs.getLong(1));
             }
-            // or alternatively, if you don't know ahead of time that
-            // the query will be a SELECT...
 
-            // Now do something with the ResultSet ....
+
+            System.out.println("Test Prepared Statement");
+            findCustomerByUID.setLong(1, 12883211224994746L);
+            rs = findCustomerByUID.executeQuery();
+
+            while (rs.next()){
+                System.out.println(rs.getLong(1));
+            }
+
+
         }
         catch (SQLException ex){
             // handle any errors
