@@ -11,7 +11,45 @@ class DatabaseThread extends Thread{
     private final String dbName = "rocks_db_test_db"; 
 
 
+    /**
+     * Customer prepared statements 
+    **/
     private PreparedStatement findCustomerByUID; 
+
+    private PreparedStatement findCustomerByAge;
+
+    /**
+     * Product prepared statements
+    **/
+
+    private PreparedStatement findProductByUID;
+
+    private PreparedStatement findProductByPrice;
+
+    private PreparedStatement findProductBeforeDate;
+
+    private PreparedStatement findProductAfterDate;
+
+    private PreparedStatement findProductBetweenDate; 
+
+    private PreparedStatement find productByInventory; 
+
+    /**
+     * Order prepared statements 
+    **/
+
+    private PreparedStatement findOrderByUID; 
+
+    private PreparedStatement findOrderByCustomer;
+
+    private PreparedStatement findOrderByProduct;
+
+    private PreparedStatement findOrderBeforeDate;
+
+    private PreparedStatement findOrderAfterDate;
+
+    private PreparedStatement findOrderBetweenDate;
+
 
 
     //Constructor  
@@ -32,7 +70,46 @@ class DatabaseThread extends Thread{
 
         // Prepare Statements
 
+        /**
+         * Customer prepared statements 
+        **/
+
+        // Find a customer by their given UID 
         String findCustomerByUID_str = "SELECT * FROM customers WHERE customer_id = ?";
+        // Find a customer by their age      
+        String findCustomerByAge = "SELECT * FROM customers WHERE age >= ? AND age <= ?";
+
+        /**
+         * Product prepared statements
+        **/
+
+        String findProductByUID_str = "SELECT * FROM products WHERE prdouct_id = ?";
+
+        String findProductByPriceRange_str = "SELECT * FROM products WHERE price >= ? AND price <= ?";
+
+        String findProductBeforeDate_str = "SELECT * FROM products WHERE posting_date  <= ? ";
+
+        String findProductAfterDate_str;
+
+        String findProductBetweenDate_str; 
+
+        String find productByInventoryRange_str "SELECT * FROM products WHERE quantity >= ? AND quantity <= ?"; 
+
+        /**
+         * Order prepared statements 
+        **/
+
+        String findOrderByUID_str = "SELECT * FROM orders WHERE order_id = ?"; 
+
+        String findOrderByCustomer_str = "SELECT * FROM orders WHERE customer_id = ?";
+
+        String findOrderByProduct_str = "SELECT * FROM orders WHERE product_id = ?";
+
+        String findOrderBeforeDate_str = "SELECT * FROM orders WHERE purchase_time <= ?";
+
+        String findOrderAfterDate_str;
+
+        String findOrderBetweenDate_str;
 
 
         try{
