@@ -24,7 +24,7 @@ class DatabaseThread extends Thread{
 
     private PreparedStatement findProductByUID;
 
-    private PreparedStatement findProductByPrice;
+    private PreparedStatement findProductByPriceRange;
 
     private PreparedStatement findProductBeforeDate;
 
@@ -32,7 +32,7 @@ class DatabaseThread extends Thread{
 
     private PreparedStatement findProductBetweenDate; 
 
-    private PreparedStatement find productByInventory; 
+    private PreparedStatement findProductByInventoryRange; 
 
     /**
      * Order prepared statements 
@@ -77,7 +77,7 @@ class DatabaseThread extends Thread{
         // Find a customer by their given UID 
         String findCustomerByUID_str = "SELECT * FROM customers WHERE customer_id = ?";
         // Find a customer by their age      
-        String findCustomerByAge = "SELECT * FROM customers WHERE age >= ? AND age <= ?";
+        String findCustomerByAge_str = "SELECT * FROM customers WHERE age >= ? AND age <= ?";
 
         /**
          * Product prepared statements
@@ -93,7 +93,7 @@ class DatabaseThread extends Thread{
 
         String findProductBetweenDate_str; 
 
-        String find productByInventoryRange_str "SELECT * FROM products WHERE quantity >= ? AND quantity <= ?"; 
+        String findProductByInventoryRange_str = "SELECT * FROM products WHERE quantity >= ? AND quantity <= ?"; 
 
         /**
          * Order prepared statements 
@@ -111,9 +111,28 @@ class DatabaseThread extends Thread{
 
         String findOrderBetweenDate_str;
 
-
         try{
+
+            // Customers            
             findCustomerByUID = conn.prepareStatement(findCustomerByUID_str);
+            findCustomerByAge = conn.prepareStatement(findCustomerByAge_str);
+
+            // Products
+            findProductByUID =  conn.prepareStatement(findProductByUID_str);
+            findProductByPriceRange = conn.prepareStatement(findProductByPriceRange_str);
+            findProductBeforeDate = conn.prepareStatement(findProductBeforeDate_str);
+            // findProductAfterDate = conn.prepareStatement(findProductAfterDate_str);
+            //findProductBetweenDate = conn.prepareStatement(findProductBetweenDate_str); 
+            findProductByInventoryRange = conn.prepareStatement(findProductByInventoryRange_str); 
+
+            // Orders
+            findOrderByUID = conn.prepareStatement(findOrderByUID_str); 
+            findOrderByCustomer = conn.prepareStatement(findOrderByCustomer_str);
+            findOrderByProduct = conn.prepareStatement(findOrderByProduct_str);
+            findOrderBeforeDate = conn.prepareStatement(findOrderBeforeDate_str);
+            // findOrderAfterDate = conn.prepareStatement(findOrderAfterDate_str);
+            // findOrderBetweenDate = conn.prepareStatement(findOrderBeforeDate_str);
+
 
         }
         catch(Exception e){
