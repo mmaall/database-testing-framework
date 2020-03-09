@@ -8,6 +8,9 @@ import java.util.Random;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 
+import com.github.cliftonlabs.json_simple.JsonArray;
+import com.github.cliftonlabs.json_simple.JsonObject;
+import com.github.cliftonlabs.json_simple.Jsonable;
 
 class DataGenerator{
 
@@ -66,20 +69,54 @@ class DataGenerator{
                                 };
 
 
+        JsonObject outputObject = new JsonObject();
+
+
+        JsonArray selectedCustomers = new JsonArray();
+
+        JsonArray selectedProducts = new JsonArray();
+
+        JsonArray selectedOrders = new JsonArray();
+
         for(int i = 0; i< rowsPerTest.length; i++){
             String fileType = fileHeaders[i];
             int numRows = rowsPerTest[i];
 
             System.out.println("**** Generating a total of " + numRows + " rows");
 
-            ArrayList<Long> customerUIDs = generateFile(fileType+"Customers.csv", (int) (numRows*.15), customerInfo, null, null);
+            ArrayList<Long> customerUIDs = generateFile(fileType+"Customers.csv", (int) (numRows*.40), customerInfo, null, null, selectedCustomers);
             System.out.println("Customers generated");
-            ArrayList<Long> productUIDs = generateFile(fileType+"Products.csv", (int)  (numRows*.5), productInfo, null, null);
+            ArrayList<Long> productUIDs = generateFile(fileType+"Products.csv", (int)  (numRows*.20), productInfo, null, null, selectedProducts);
             System.out.println("Products generated");
-            generateFile(fileType+"Orders.csv", (int) (numRows*.35), orderInfo, customerUIDs, productUIDs); 
+            generateFile(fileType+"Orders.csv", (int) (numRows*.40), orderInfo, customerUIDs, productUIDs, selectedOrders); 
             System.out.println("Orders generated");
+            
+
+
+            outputObject.put("customers", selectedCustomers);
+            //System.out.println("Total customerUID length: " + customerUIDs.size());
+            //System.out.println("Selected Customers: " + selectedCustomers.size());
+            outputObject.put("products", selectedProducts);
+            outputObject.put("orders", selectedOrders);
+
+            Path p = Paths.get("./"+fileType+"SelectedIDs.json");
+            byte[] data = outputObject.toJson().getBytes();
+
+            // Write out the data 
+            try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(p))){
+                out.write(data, 0, data.length);
+            }
+            catch (IOException x) {
+                System.err.println(x);
+            }
         }
 
+        // Write out the jsonfile
+
+        outputObject.put("customers", selectedCustomers);
+        outputObject.put("products", selectedProducts);
+        outputObject.put("orders", selectedOrders);
+        System.out.println(selectedOrders);
     }
 
 
@@ -89,7 +126,8 @@ class DataGenerator{
     // dependent on it   
     public static ArrayList<Long> generateFile(String fileName, int numberOfRows, 
                                       Object[][] tableInfo, 
-                                      ArrayList<Long> uidSet1, ArrayList<Long> uidSet2){
+                                      ArrayList<Long> uidSet1, ArrayList<Long> uidSet2,
+                                      JsonArray selectedUIDs){
         System.out.println("Generating " + fileName);
         System.out.println("Rows: " + numberOfRows);
         // Number of records that are going to be written out together 
@@ -98,6 +136,9 @@ class DataGenerator{
         int numAttributes = tableInfo.length;
 
         ArrayList<Long> uniqueIDs = new ArrayList<Long>();
+
+        int uidsCollected = 0;
+        int uidsToCollect = (int) (numberOfRows * .2); 
 
         // Write the file header
 
@@ -160,6 +201,11 @@ class DataGenerator{
                                 }
 
                                 outputStr += key;
+
+                                if (uidsCollected < uidsToCollect){
+                                    selectedUIDs.add(key);
+                                    uidsCollected++;
+                                }
 
                             }
                             // Otherwise we will pick a key using a gausien distribution 
