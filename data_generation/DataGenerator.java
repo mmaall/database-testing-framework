@@ -8,9 +8,8 @@ import java.util.Random;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 
-import com.github.cliftonlabs.json_simple.JsonArray;
-import com.github.cliftonlabs.json_simple.JsonObject;
-import com.github.cliftonlabs.json_simple.Jsonable;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 class DataGenerator{
 
@@ -69,14 +68,14 @@ class DataGenerator{
                                 };
 
 
-        JsonObject outputObject = new JsonObject();
+        JSONObject outputObject = new JSONObject();
 
 
-        JsonArray selectedCustomers = new JsonArray();
+        JSONArray selectedCustomers = new JSONArray();
 
-        JsonArray selectedProducts = new JsonArray();
+        JSONArray selectedProducts = new JSONArray();
 
-        JsonArray selectedOrders = new JsonArray();
+        JSONArray selectedOrders = new JSONArray();
 
         for(int i = 0; i< rowsPerTest.length; i++){
             String fileType = fileHeaders[i];
@@ -100,7 +99,7 @@ class DataGenerator{
             outputObject.put("orders", selectedOrders);
 
             Path p = Paths.get("./"+fileType+"SelectedIDs.json");
-            byte[] data = outputObject.toJson().getBytes();
+            byte[] data = outputObject.toJSONString().getBytes();
 
             // Write out the data 
             try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(p))){
@@ -127,7 +126,7 @@ class DataGenerator{
     public static ArrayList<Long> generateFile(String fileName, int numberOfRows, 
                                       Object[][] tableInfo, 
                                       ArrayList<Long> uidSet1, ArrayList<Long> uidSet2,
-                                      JsonArray selectedUIDs){
+                                      JSONArray selectedUIDs){
         System.out.println("Generating " + fileName);
         System.out.println("Rows: " + numberOfRows);
         // Number of records that are going to be written out together 
