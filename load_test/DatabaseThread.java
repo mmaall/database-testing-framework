@@ -9,7 +9,11 @@ class DatabaseThread extends Thread{
     private String dbUrl;
     private Connection conn;
     private final String dbName = "rocks_db_test_db"; 
+    // Holds how long the thread will run queries for in seconds  
+    private long threadRuntime = 60 * 60 * 1000; // minutes * seconds * milliseconds
 
+
+    private RecordInfo recordInfo; 
 
     /**
      * Customer prepared statements 
@@ -53,14 +57,18 @@ class DatabaseThread extends Thread{
 
 
     //Constructor  
-    DatabaseThread(String name, String databaseUrl) {
+    DatabaseThread(String name, String databaseUrl, RecordInfo recordInfo) {
         System.out.println("Creating " +  name);
         threadName = name;
-        dbUrl = databaseUrl; 
+        dbUrl = databaseUrl;
+
+        this.recordInfo = recordInfo; 
        
         // Set up connection
         try{
             conn = DriverManager.getConnection(dbUrl);
+            // Turning off autocommit 
+            conn.setAutoCommit(false);
         }
         catch(SQLException e){
             System.err.println("ERROR: Unable to connect to " + dbUrl);
@@ -122,7 +130,7 @@ class DatabaseThread extends Thread{
             findProductByPriceRange = conn.prepareStatement(findProductByPriceRange_str);
             findProductBeforeDate = conn.prepareStatement(findProductBeforeDate_str);
             // findProductAfterDate = conn.prepareStatement(findProductAfterDate_str);
-            //findProductBetweenDate = conn.prepareStatement(findProductBetweenDate_str); 
+            // findProductBetweenDate = conn.prepareStatement(findProductBetweenDate_str); 
             findProductByInventoryRange = conn.prepareStatement(findProductByInventoryRange_str); 
 
             // Orders
@@ -143,7 +151,7 @@ class DatabaseThread extends Thread{
 
      
     public void run() {
-        System.out.println("Running " +  threadName);
+        System.out.println("Running " + threadName);
         Statement stmt = null;
         ResultSet rs = null;
 
@@ -175,6 +183,42 @@ class DatabaseThread extends Thread{
             System.out.println("SQLState: " + ex.getSQLState());
             System.out.println("VendorError: " + ex.getErrorCode());
         }
+
+
+        // Let's do some real stuff
+        long threadStartTime = System.currentTimeMillis();
+
+        long threadEndTime = threadStartTime + threadRuntime; 
+
+        // Run this thread for the predetirmined amount of time. 
+        while(System.currentTimeMillis() < threadEndTime){
+
+            // Let's start executing queries 
+
+            // Generate a number between 1 and 100 
+            int randomInt = (int) (Math.random()*100); 
+
+            // Get a customer's information
+            if(randomInt <= 100){
+
+                long uid = recordInfo.getCustomerUID();
+                try{
+                    findCustomerByUID.setLong(1, uid);
+                    ResultSet rset = findCustomerByUID.executeQuery();
+                    if(rset.next()){
+                        System.out.println("ID Found: " + rset.getLong(1));
+                    }
+                }
+                catch(SQLException e){
+                    System.err.println("ERROR: Sql exception during query.");
+                    System.err.println(e.toString());
+                }
+
+            }
+
+
+        }
+
 
 
         System.out.println("Thread " +  threadName + " exiting.");
