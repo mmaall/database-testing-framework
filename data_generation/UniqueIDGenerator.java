@@ -1,4 +1,6 @@
 
+package data_generation; 
+
 // Class to generate unique identifiers
 
 /**
@@ -13,7 +15,7 @@ import java.util.UUID;
 
 
 // Static class that generates some unique identifiers
-class UniqueIDGenerator{
+public class UniqueIDGenerator{
 
 
     private static final int SIZE_OF_INT = 4;
@@ -127,17 +129,3 @@ class UniqueIDGenerator{
 
 }
 
-
-//Exception to be thrown when invalid paramters are used 
-class InvalidValueException extends Exception{
-
-    public InvalidValueException(){
-        super();
-    }
-
-    public InvalidValueException(String message){
-        super(message);
-    }
-
-
-}

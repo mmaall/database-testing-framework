@@ -11,6 +11,8 @@ import java.text.SimpleDateFormat;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import data_generation.UniqueIDGenerator;
+
 class DataGenerator{
 
     public static final int BIGINT = 0;
@@ -77,7 +79,7 @@ class DataGenerator{
 
         JSONArray selectedOrders = new JSONArray();
 
-        for(int i = 0; i< rowsPerTest.length; i++){
+        for(int i = 0; i< 3; i++){
             String fileType = fileHeaders[i];
             int numRows = rowsPerTest[i];
 
@@ -137,7 +139,7 @@ class DataGenerator{
         ArrayList<Long> uniqueIDs = new ArrayList<Long>();
 
         int uidsCollected = 0;
-        int uidsToCollect = (int) (numberOfRows * .2); 
+        int uidsToCollect = (int) (numberOfRows * .05); 
 
         // Write the file header
 

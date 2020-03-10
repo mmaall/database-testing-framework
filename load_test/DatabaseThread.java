@@ -1,6 +1,6 @@
 import java.sql.*;
 import java.util.ArrayList;
-
+import data_generation.*;
 
 
 class DatabaseThread extends Thread{
@@ -13,6 +13,8 @@ class DatabaseThread extends Thread{
     // Holds how long the thread will run queries for in seconds  
     private long threadRuntime = (long) (.25 * 60 * 1000); // minutes * seconds * milliseconds
 
+    private byte threadID;
+    private byte systemID;
 
     private RecordInfo recordInfo; 
 
@@ -62,11 +64,12 @@ class DatabaseThread extends Thread{
 
 
     //Constructor  
-    DatabaseThread(String name, String databaseUrl, RecordInfo recordInfo) {
+    DatabaseThread(String name, String databaseUrl, RecordInfo recordInfo, byte systemID, byte threadID) {
         System.out.println("Creating " +  name);
         threadName = name;
         dbUrl = databaseUrl;
-
+        this.threadID = threadID;
+        this.systemID = systemID;
         this.recordInfo = recordInfo; 
        
         // Set up connection
@@ -126,7 +129,7 @@ class DatabaseThread extends Thread{
 
         String findOrderBetweenDate_str;
 
-        String insertOrder = "INSERT INTO orders (order_id, customer_id, product_id, quantity) VALUES (?, ?, ?, ?)";
+        String insertOrder_str = "INSERT INTO orders (order_id, customer_id, product_id, quantity) VALUES (?, ?, ?, ?)";
 
 
         try{
@@ -151,7 +154,7 @@ class DatabaseThread extends Thread{
             findOrderBeforeDate = conn.prepareStatement(findOrderBeforeDate_str);
             // findOrderAfterDate = conn.prepareStatement(findOrderAfterDate_str);
             // findOrderBetweenDate = conn.prepareStatement(findOrderBeforeDate_str);
-
+            insertOrder = conn.prepareStatement(insertOrder_str);
 
         }
         catch(Exception e){
@@ -200,8 +203,16 @@ class DatabaseThread extends Thread{
         // UID information holders
 
 
+        // UniqueID Generator
 
-
+        UniqueIDGenerator uidGenerator = null;
+        try{
+            uidGenerator = new UniqueIDGenerator(systemID, threadID);
+        }
+        catch(Exception e){
+            System.err.println(e.toString());
+            return;
+        }
         // Run this thread for the predetirmined amount of time. 
         while(System.currentTimeMillis() < threadEndTime){
 
@@ -292,12 +303,20 @@ class DatabaseThread extends Thread{
                         productIds[(int) (Math.random()*productIds.length)];
                 // Generate the UID for the order
 
+
+                long orderUID = uidGenerator.getUID();
+
                 // Prepare the queries we can
                 try{
                     findCustomerByUID.setLong(1, customerUID);
 
                     updateProductByID.setInt(1, -1 * amountToAdd);
                     updateProductByID.setLong(2, productToAdd);
+
+                    insertOrder.setLong(1, orderUID);
+                    insertOrder.setLong(2, customerUID);
+                    insertOrder.setLong(3, productToAdd);
+                    insertOrder.setInt(4, amountToAdd);
 
                     // Start executing
                     long txnTime = System.currentTimeMillis();
@@ -313,6 +332,8 @@ class DatabaseThread extends Thread{
                     updateProductByID.executeUpdate();
 
                     // Insert the order 
+                    insertOrder.executeUpdate();
+
 
                     conn.commit();
                     
