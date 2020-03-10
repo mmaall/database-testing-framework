@@ -57,6 +57,8 @@ class DatabaseThread extends Thread{
 
     private PreparedStatement findOrderBetweenDate;
 
+    private PreparedStatement insertOrder; 
+
 
 
     //Constructor  
@@ -124,6 +126,8 @@ class DatabaseThread extends Thread{
 
         String findOrderBetweenDate_str;
 
+        String insertOrder = "INSERT INTO orders (order_id, customer_id, product_id, quantity) VALUES (?, ?, ?, ?)";
+
 
         try{
 
@@ -181,7 +185,7 @@ class DatabaseThread extends Thread{
             System.err.println(e.toString());
         }
 
-        System.exit(-1);
+        //System.exit(-1);
 
         // Let's do some real stuff
         long threadStartTime = System.currentTimeMillis();
@@ -206,6 +210,7 @@ class DatabaseThread extends Thread{
             // Generate a number between 1 and 100 
             int randomInt = (int) (Math.random()*100); 
 
+
             // Get a customer's information, get orders for that customer
             // Uses the hot records provided on this machine
             if(randomInt < 99){
@@ -220,7 +225,7 @@ class DatabaseThread extends Thread{
                     // Execute query
                     ResultSet rset = findCustomerByUID.executeQuery();
                     if(rset.next()){
-                        System.out.println("ID Found: " + rset.getLong(1));
+                        //System.out.println("ID Found: " + rset.getLong(1));
                     }
 
                     rset = findOrderByCustomer.executeQuery();
@@ -271,8 +276,61 @@ class DatabaseThread extends Thread{
 
             }
 
+                    // Get customer info
+            // Get info about 10 products
+            // Order one of those products
+            else if (randomInt == 200){
+
+                long customerUID = recordInfo.getCustomerUID();
+                long[] productIds = new long[10];
+                for (int i = 0; i < productIds.length; i++){
+                    productIds[i] = recordInfo.getProductUID();
+                }
+
+                int amountToAdd = (int) (Math.random() * 100);
+                long productToAdd = 
+                        productIds[(int) (Math.random()*productIds.length)];
+                // Generate the UID for the order
+
+                // Prepare the queries we can
+                try{
+                    findCustomerByUID.setLong(1, customerUID);
+
+                    updateProductByID.setInt(1, -1 * amountToAdd);
+                    updateProductByID.setLong(2, productToAdd);
+
+                    // Start executing
+                    long txnTime = System.currentTimeMillis();
+                    // Get the customer info 
+                    ResultSet rset = findCustomerByUID.executeQuery();
+                    // Get the info about all those good products
+                    for(int i = 0; i< productIds.length; i++){
+                        findProductByUID.setLong(1, productIds[i]);
+                        rset = findProductByUID.executeQuery();
+                    }
+
+                    // Update the product to remove the quantity to order
+                    updateProductByID.executeUpdate();
+
+                    // Insert the order 
+
+                    conn.commit();
+                    
+
+                    txnTime = System.currentTimeMillis() - txnTime;
+                    totalTransactionTime += txnTime;
+                    numTransactions++; 
+
+                }
+                catch(SQLException e){
+                    System.err.println("ERROR: Sql exception during query.");
+                    System.err.println(e.toString());
+                }
+            }
 
         }
+
+
 
         System.out.println("Number of transactions: " + numTransactions);
         System.out.println("Total time in transactions: "+ totalTransactionTime);
