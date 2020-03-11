@@ -18,7 +18,7 @@ class TestDriver{
 
         RecordInfo selectedRecordInfo = new RecordInfo(infoFile);
 
-        DatabaseThread dbThread1 = new DatabaseThread("thread1", fullUrl, selectedRecordInfo, 0, 0);
+        DatabaseThread dbThread1 = new DatabaseThread("thread1", fullUrl, selectedRecordInfo, (byte) 0, (byte) 0, 120 * 1000);
         dbThread1.start();
         System.out.println("Is thread alive? " + dbThread1.isAlive());
         
