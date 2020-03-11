@@ -22,7 +22,7 @@ class DatabaseThread extends Thread{
 
     private RecordInfo recordInfo; 
 
-    private int numEpochs = 2;  
+    private int numEpochs;  
 
     private TransactionInfo txnInfo;
 
@@ -83,6 +83,9 @@ class DatabaseThread extends Thread{
         this.systemID = systemID;
         this.recordInfo = recordInfo; 
         this.threadRuntime = threadRuntime; 
+
+        numEpochs = (int) (threadRuntime / 1000 / 60);
+
         // Set up connection
         try{
             conn = DriverManager.getConnection(dbUrl);
