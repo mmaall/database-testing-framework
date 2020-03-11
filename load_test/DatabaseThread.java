@@ -1,6 +1,10 @@
 import java.sql.*;
 import java.util.ArrayList;
 import data_generation.*;
+import java.util.Random;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 
 
 class DatabaseThread extends Thread{
@@ -107,7 +111,7 @@ class DatabaseThread extends Thread{
 
         String findProductAfterDate_str;
 
-        String findProductBetweenDate_str; 
+        String findProductBetweenDate_str = "SELECT * FROM products WHERE posting_date >= ? AND posting_date <= ?";  
 
         String findProductByInventoryRange_str = "SELECT * FROM products WHERE quantity >= ? AND quantity <= ?"; 
 
@@ -143,7 +147,7 @@ class DatabaseThread extends Thread{
             findProductByPriceRange = conn.prepareStatement(findProductByPriceRange_str);
             findProductBeforeDate = conn.prepareStatement(findProductBeforeDate_str);
             // findProductAfterDate = conn.prepareStatement(findProductAfterDate_str);
-            // findProductBetweenDate = conn.prepareStatement(findProductBetweenDate_str); 
+            findProductBetweenDate = conn.prepareStatement(findProductBetweenDate_str); 
             findProductByInventoryRange = conn.prepareStatement(findProductByInventoryRange_str);
             updateProductByID = conn.prepareStatement(updateProductByID_str); 
 
@@ -168,25 +172,37 @@ class DatabaseThread extends Thread{
         System.out.println("Running " + threadName);
 
         // Test query
-        long test_uid = recordInfo.getProductUID();
-        System.out.println("UID: " + test_uid);
-        
-        try{
-            int amountToAdd = (int) (Math.random() * 1000);
-            System.out.println("Amount added: " + amountToAdd);
-            updateProductByID.setInt(1, amountToAdd);
-            updateProductByID.setLong(2, test_uid);
 
-            System.out.println(updateProductByID.toString());
-            int numUpdated = updateProductByID.executeUpdate();
-            System.out.println("Rows updated: "+ numUpdated);
+        String d1 = createRandomDate(2000, 2010).toString();
+        String d2 = createRandomDate(2010, 2020).toString();
+
+        try{
+
+            findProductBetweenDate.setString(1, d1);
+            findProductBetweenDate.setString(2, d2);
+
+            // Start executing
+            long txnTime = System.currentTimeMillis();
+            // Get the customer info 
+            ResultSet rset = findProductBetweenDate.executeQuery();
+            
             conn.commit();
+
+            // Deal with the result set
+
+            while(rset.next()){
+                long productUID = rset.getLong(1);
+                System.out.println("Product UID: " + productUID); 
+            }
 
         }
         catch(SQLException e){
             System.err.println("ERROR: Sql exception during query.");
             System.err.println(e.toString());
         }
+
+
+
 
         //System.exit(-1);
 
@@ -224,7 +240,7 @@ class DatabaseThread extends Thread{
 
             // Get a customer's information, get orders for that customer
             // Uses the hot records provided on this machine
-            if(randomInt < 99){
+            if(randomInt < 75){
 
                 long uid = recordInfo.getCustomerUID();
                 try{
@@ -287,10 +303,10 @@ class DatabaseThread extends Thread{
 
             }
 
-                    // Get customer info
+            // Get customer info
             // Get info about 10 products
             // Order one of those products
-            else if (randomInt == 200){
+            else if (75<= randomInt && randomInt < 99){
 
                 long customerUID = recordInfo.getCustomerUID();
                 long[] productIds = new long[10];
@@ -347,6 +363,46 @@ class DatabaseThread extends Thread{
                     System.err.println("ERROR: Sql exception during query.");
                     System.err.println(e.toString());
                 }
+
+
+            }
+
+
+            // Get the products in a date range 
+            else if(75<= randomInt && randomInt < 99){
+
+                String date1 = createRandomDate(2000, 2010).toString();
+                String date2 = createRandomDate(2010, 2020).toString();
+
+                try{
+
+                    findProductBetweenDate.setString(1, date1);
+                    findProductBetweenDate.setString(2, date2);
+
+                    // Start executing
+                    long txnTime = System.currentTimeMillis();
+                    // Get the customer info 
+                    ResultSet rset = findProductBetweenDate.executeQuery();
+                    
+                    conn.commit();
+                    
+                    txnTime = System.currentTimeMillis() - txnTime;
+                    totalTransactionTime += txnTime;
+                    numTransactions++; 
+
+                    // Deal with the result set
+
+                    while(rset.next()){
+                        long productUID = rset.getLong(1);
+                    }
+
+                }
+                catch(SQLException e){
+                    System.err.println("ERROR: Sql exception during query.");
+                    System.err.println(e.toString());
+                }
+
+
             }
 
         }
@@ -364,5 +420,23 @@ class DatabaseThread extends Thread{
 
     public int getCount(){
         return count;
+    }
+
+        /**
+     * Borrowed this from the internet
+     * Wasn't in the mood to write it myself. Thanks internet, you do great. 
+     * src: https://www.logicbig.com/how-to/code-snippets/jcode-java-random-random-dates.html
+     *
+    **/
+
+    public static int createRandomIntBetween(int start, int end) {
+        return start + (int) Math.round(Math.random() * (end - start));
+    }
+
+    public static LocalDate createRandomDate(int startYear, int endYear) {
+        int day = createRandomIntBetween(1, 28);
+        int month = createRandomIntBetween(1, 12);
+        int year = createRandomIntBetween(startYear, endYear);
+        return LocalDate.of(year, month, day);
     }
 } 
