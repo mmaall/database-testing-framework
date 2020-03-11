@@ -1,3 +1,10 @@
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import static java.nio.file.StandardOpenOption.*;
+import java.nio.file.*;
+import java.io.*;
+
 public class TransactionInfo{
 
 
@@ -10,6 +17,7 @@ public class TransactionInfo{
 
     private int totalNumTransactions;
 
+    private String tag; 
 
     private long startTime;
     //Holds the number of epochs we will handle.
@@ -28,6 +36,8 @@ public class TransactionInfo{
 
         transactionTimePerEpoch = new long[numEpochs];
         totalNumTransactionsPerEpoch = new long[numEpochs];
+        //No tag by default
+        tag = "";
     }
 
     public void addTransaction(long txnStartTime, long txnEndTime){
@@ -71,6 +81,10 @@ public class TransactionInfo{
         return numEpochs;
     }
 
+    public void setTag(String tag){
+        this.tag = tag; 
+    }
+
     // Moves all the information from input into this object. 
     public boolean combine(TransactionInfo input){
 
@@ -92,6 +106,39 @@ public class TransactionInfo{
 
         return true;
     }
+
+    public void toJsonFile(String path){
+
+
+        // First let's convert this to json
+        JSONObject rootObj = new JSONObject();
+        rootObj.put("tag", tag);
+        rootObj.put("totalNumTransactions", totalNumTransactions);
+        rootObj.put("totalTransactionTime", totalTransactionTime);
+        rootObj.put("numEpochs", numEpochs);
+
+        JSONArray txnPerEpoch = new JSONArray();
+        JSONArray txnTimePerEpoch = new JSONArray();
+
+        for(int i = 0; i < numEpochs; i++){
+            txnPerEpoch.add(totalNumTransactionsPerEpoch[i]);
+            txnTimePerEpoch.add(transactionTimePerEpoch[i]);
+        }
+
+        rootObj.put("totalNumTransactionsPerEpoch", txnPerEpoch);
+        rootObj.put("transactionTimePerEpoch", txnTimePerEpoch);
+
+        Path p = Paths.get(path);
+        byte[] data = rootObj.toJSONString().getBytes();
+
+        // Write out the data 
+        try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(p))){
+            out.write(data, 0, data.length);
+        }
+        catch (IOException x) {
+            System.err.println(x);
+        }
+    } 
 
     public String toString(){
 
