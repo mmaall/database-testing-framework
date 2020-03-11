@@ -33,7 +33,7 @@ public class TransactionInfo{
     public void addTransaction(long txnStartTime, long txnEndTime){
         // Figure out the epoch 
         int epoch = (int) ((txnStartTime - startTime) / (1000 * 60) );
-        System.out.println(epoch); 
+        //System.out.println(epoch); 
         if (numEpochs <= epoch){
             System.err.println("ERROR: Epoch " + epoch + "for txn starting at " + 
                                     txnStartTime +"exceeds number of valid epochs");
@@ -51,8 +51,46 @@ public class TransactionInfo{
         totalNumTransactions += 1;
     }
 
+    public long getTotalTransactionTime(){
+        return totalTransactionTime;
+    }
+
     public long getTotalNumTransactions(){
         return totalNumTransactions; 
+    }
+
+    public long[] getNumTransactionsPerEpoch(){
+        return totalNumTransactionsPerEpoch;
+    }
+
+    public long[] getTransactionTimePerEpoch(){
+        return transactionTimePerEpoch;
+    }
+
+    public int getNumEpochs(){
+        return numEpochs;
+    }
+
+    // Moves all the information from input into this object. 
+    public boolean combine(TransactionInfo input){
+
+
+        if(numEpochs != input.numEpochs){
+            return false;
+        }
+        
+
+        totalNumTransactions += input.totalNumTransactions;
+        totalTransactionTime += input.totalTransactionTime; 
+
+        for(int i = 0; i < numEpochs; i++){
+           totalNumTransactionsPerEpoch[i] += input.totalNumTransactionsPerEpoch[i];
+           transactionTimePerEpoch[i] += input.transactionTimePerEpoch[i]; 
+
+        }
+
+
+        return true;
     }
 
     public String toString(){

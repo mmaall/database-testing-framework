@@ -199,7 +199,7 @@ class DatabaseThread extends Thread{
 
             while(rset.next()){
                 long productUID = rset.getLong(1);
-                System.out.println("Product UID: " + productUID); 
+                //System.out.println("Product UID: " + productUID); 
             }
 
         }
@@ -265,7 +265,7 @@ class DatabaseThread extends Thread{
 
                 // pull from the queue of ones we've quiered upon 
                 if (randomVal == 0 && customerQueue.size() > 0 ){
-                    System.out.println("Random value");
+                    //System.out.println("Random value");
                     uid = customerQueue.remove(0); 
                 } 
                 // Get from the hot records
@@ -328,7 +328,7 @@ class DatabaseThread extends Thread{
 
                 // pull from the queue of ones we've quiered upon 
                 if (randomVal == 0 && productQueue.size() > 0 ){
-                    System.out.println("Selecting from product queue");
+                    //System.out.println("Selecting from product queue");
                     uid = productQueue.remove(0); 
                 } 
                 // Get from the hot records
@@ -372,7 +372,7 @@ class DatabaseThread extends Thread{
 
                 // pull from the queue of ones we've quiered upon 
                 if (randomVal == 0 && customerQueue.size() > 0 ){
-                    System.out.println("Random value");
+                    //System.out.println("Random value");
                     customerUID = customerQueue.remove(0); 
                 } 
                 // Get from the hot records
@@ -494,16 +494,23 @@ class DatabaseThread extends Thread{
 
 
 
-        System.out.println("Number of transactions: " + numTransactions);
-        System.out.println("Total time in transactions: "+ totalTransactionTime);
+        //System.out.println("Number of transactions: " + numTransactions);
+        //System.out.println("Total time in transactions: "+ totalTransactionTime);
 
         double avgTxnTime = totalTransactionTime / numTransactions;
+        
+        /*
         System.out.println("Average Transaction Time: "+ avgTxnTime);
         System.out.println("Transactional info from object");
         System.out.println(txnInfo);
+        */
         System.out.println("Thread " +  threadName + " exiting.");
     }
 
+
+    public TransactionInfo getTransactionInfo(){
+        return txnInfo;
+    }
 
     public int getCount(){
         return count;
