@@ -46,7 +46,7 @@ public class TransactionInfo{
     // 50th percentile, 99th percentile, 99.9th percentile
     private double[] avgTxnTimes = new double[3];
 
-
+    private double[] percentiles = {.5, .99, .999};
 
     public TransactionInfo(){
 
@@ -123,7 +123,26 @@ public class TransactionInfo{
     // Let's do some math 
     public void compute(){
         Collections.sort(transactionTimes);
-        isSorted = false;
+        isSorted = true;
+
+        // Let's calculate the tail latency
+
+        int sizeTxnTimes = transactionTimes.size();
+
+        for(int i = 0; i < percentiles.length; i++){
+
+            long timeSum = 0;
+            int numberOfTransactions = (int) (sizeTxnTimes * percentiles[i]);
+            int startingPosition = sizeTxnTimes - numberOfTransactions;
+
+            for (int j = startingPosition; j < sizeTxnTimes; j++){
+                timeSum += transactionTimes.get(j);
+            }
+
+            double avgTime = timeSum / numberOfTransactions;
+
+            avgTxnTimes[i] = avgTime; 
+        }
     }
 
     // Moves all the information from input into this object. 
@@ -183,7 +202,6 @@ public class TransactionInfo{
 
     public void toJsonFile(String path, String allTransactionsPath){
 
-        compute();
 
         // First let's convert this to json
         JSONObject rootObj = new JSONObject();
@@ -289,7 +307,7 @@ public class TransactionInfo{
             e.printStackTrace();
         }
 
-
+        compute();
 
 
         return true;
