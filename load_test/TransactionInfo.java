@@ -5,6 +5,16 @@ import static java.nio.file.StandardOpenOption.*;
 import java.nio.file.*;
 import java.io.*;
 
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.util.Iterator;
+import java.util.Arrays;
+
+
 public class TransactionInfo{
 
 
@@ -27,6 +37,13 @@ public class TransactionInfo{
 
 
     public TransactionInfo(){
+
+    }
+
+    // Create TransactionInfo Object by reading the file defined by the path
+    public TransactionInfo(String path){
+
+        readFromJsonFile(path);
 
     }
 
@@ -138,7 +155,54 @@ public class TransactionInfo{
         catch (IOException x) {
             System.err.println(x);
         }
+    }
+
+    public boolean readFromJsonFile(String path){
+        JSONParser parser = new JSONParser();
+
+        try (Reader reader = new FileReader(path)) {
+
+            JSONObject jsonObject = (JSONObject) parser.parse(reader);
+
+
+            // Deal with the arrays 
+            JSONArray txnPerEpoch = (JSONArray) jsonObject.get("totalNumTransactionsPerEpoch");
+
+            JSONArray txnTimePerEpoch = (JSONArray) jsonObject.get("transactionTimePerEpoch");
+
+            totalNumTransactionsPerEpoch = copyToArray(txnPerEpoch);  
+             
+            transactionTimePerEpoch = copyToArray(txnTimePerEpoch);  
+
+            // Read in the numbers 
+            
+
+            if (jsonObject.get("tag") != null){
+                tag = (String) jsonObject.get("tag");
+            }
+
+            totalNumTransactions = ((Number) jsonObject.get("totalNumTransactions")).intValue();
+            totalTransactionTime = (Long) (jsonObject.get("totalTransactionTime"));
+            numEpochs = ((Number) jsonObject.get("numEpochs")).intValue();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return true;
     } 
+
+    private static long[] copyToArray(JSONArray arr){
+        long[] outputArr = new long[arr.size()];
+        for(int i = 0; i<arr.size(); i++){
+            outputArr[i] = (long) arr.get(i);
+        }
+
+        return outputArr;
+    }
+
 
     public String toString(){
 
@@ -147,6 +211,7 @@ public class TransactionInfo{
         outputStr += "Total Time Of Transactions: " + totalTransactionTime + "\n";
         outputStr += "Transaction time per epoch: " + arrToString(transactionTimePerEpoch) + "\n";
         outputStr += "Total transactions per epoch: " + arrToString(totalNumTransactionsPerEpoch) + "\n";
+        outputStr += "Number of epochs: " + numEpochs + "\n";
 
         return outputStr; 
     }
