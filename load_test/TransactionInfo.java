@@ -132,7 +132,7 @@ public class TransactionInfo{
         for(int i = 0; i < percentiles.length; i++){
 
             long timeSum = 0;
-            int numberOfTransactions = (int) (sizeTxnTimes * percentiles[i]);
+            int numberOfTransactions = (int) (sizeTxnTimes * (1-percentiles[i]));
             int startingPosition = sizeTxnTimes - numberOfTransactions;
 
             for (int j = startingPosition; j < sizeTxnTimes; j++){
@@ -202,6 +202,7 @@ public class TransactionInfo{
 
     public void toJsonFile(String path, String allTransactionsPath){
 
+        compute();
 
         // First let's convert this to json
         JSONObject rootObj = new JSONObject();
@@ -209,6 +210,24 @@ public class TransactionInfo{
         rootObj.put("totalNumTransactions", totalNumTransactions);
         rootObj.put("totalTransactionTime", totalTransactionTime);
         rootObj.put("numEpochs", numEpochs);
+
+        // Add percentile info
+        JSONObject percentileObj = new JSONObject();
+
+        JSONArray percentileArray = new JSONArray();
+        JSONArray timeArray = new JSONArray();
+
+        for(int i = 0; i < avgTxnTimes.length; i++){
+            percentileArray.add(percentiles[i]);
+            timeArray.add(avgTxnTimes[i]);
+        }
+
+        percentileObj.put("percentiles", percentileArray);
+        percentileObj.put("avgTxnTimes", timeArray);
+
+        rootObj.put("percentileInfo", percentileObj);
+
+
 
         JSONArray txnPerEpoch = new JSONArray();
         JSONArray txnTimePerEpoch = new JSONArray();
@@ -274,7 +293,23 @@ public class TransactionInfo{
             transactionTimePerEpoch = copyToArray(txnTimePerEpoch);  
 
             // Read in the numbers 
-            
+           
+            try{
+                JSONObject percentileObj = (JSONObject) jsonObject.get("percentileInfo"); 
+
+                JSONArray percentileArray = (JSONArray) percentileObj.get("percentiles");
+                JSONArray timeArray = (JSONArray) percentileObj.get("avgTxnTimes");
+
+                for(int i = 0; i < percentileArray.size(); i++){
+                    percentiles[i] = (Double) percentileArray.get(i);
+                    avgTxnTimes[i] = (Double) timeArray.get(i);
+                }
+            }
+            catch(Exception e){
+                System.err.println("ERROR: Error reading in percentile info");
+                System.err.println(e.toString());
+            }
+
 
             if (jsonObject.get("tag") != null){
                 tag = (String) jsonObject.get("tag");
