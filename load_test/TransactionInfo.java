@@ -14,6 +14,8 @@ import java.io.Reader;
 import java.util.Iterator;
 import java.util.Arrays;
 
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class TransactionInfo{
 
@@ -22,6 +24,12 @@ public class TransactionInfo{
     private long[] transactionTimePerEpoch;
     // the total number of transactions completed in an epoch
     private long[] totalNumTransactionsPerEpoch;
+    // Holds the transaction times, yes all of them 
+
+    // Can tell whether transactions are sorted
+    private boolean isSorted = false;
+    // Holds how long each transaction took
+    private ArrayList<Long> transactionTimes;
 
     private long totalTransactionTime;
 
@@ -34,6 +42,10 @@ public class TransactionInfo{
     //An epoch is by default 60 seconds 
     private int numEpochs;
 
+    // holds average transaction times
+    // 50th percentile, 99th percentile, 99.9th percentile
+    private double[] avgTxnTimes = new double[3];
+
 
 
     public TransactionInfo(){
@@ -41,9 +53,11 @@ public class TransactionInfo{
     }
 
     // Create TransactionInfo Object by reading the file defined by the path
-    public TransactionInfo(String path){
+    public TransactionInfo(String path, String allTransactionsPath){
 
-        readFromJsonFile(path);
+        transactionTimes = new ArrayList<Long>();
+
+        readFromJsonFile(path, allTransactionsPath);
 
     }
 
@@ -55,6 +69,7 @@ public class TransactionInfo{
         totalNumTransactionsPerEpoch = new long[numEpochs];
         //No tag by default
         tag = "";
+        transactionTimes = new ArrayList<Long>();
     }
 
     public void addTransaction(long txnStartTime, long txnEndTime){
@@ -68,6 +83,8 @@ public class TransactionInfo{
         } 
 
         long timeInTransaction = txnEndTime - txnStartTime;
+
+        transactionTimes.add(timeInTransaction);
 
         totalNumTransactionsPerEpoch[epoch] += 1; 
 
@@ -102,6 +119,13 @@ public class TransactionInfo{
         this.tag = tag; 
     }
 
+
+    // Let's do some math 
+    public void compute(){
+        Collections.sort(transactionTimes);
+        isSorted = false;
+    }
+
     // Moves all the information from input into this object. 
     public boolean combine(TransactionInfo input){
 
@@ -120,12 +144,46 @@ public class TransactionInfo{
 
         }
 
+        // Let's combine
 
+        if (!isSorted){
+            Collections.sort(transactionTimes);
+        } 
+
+        if (!input.isSorted){
+            Collections.sort(input.transactionTimes);
+        }
+
+        ArrayList<Long> newTransactionTime = new ArrayList<Long>();
+
+        while (transactionTimes.size()>0 || input.transactionTimes.size() > 0){
+            
+            if(transactionTimes.size() == 0){
+                newTransactionTime.add(input.transactionTimes.remove(0));
+                continue; 
+            }
+
+            if(input.transactionTimes.size() == 0){
+                newTransactionTime.add(transactionTimes.remove(0));
+                continue; 
+            }
+
+
+            if(input.transactionTimes.get(0) < transactionTimes.get(0)){
+                newTransactionTime.add(input.transactionTimes.remove(0));
+            }
+            else{
+                newTransactionTime.add(transactionTimes.remove(0));
+            }
+        }
+
+        transactionTimes = newTransactionTime;
         return true;
     }
 
-    public void toJsonFile(String path){
+    public void toJsonFile(String path, String allTransactionsPath){
 
+        compute();
 
         // First let's convert this to json
         JSONObject rootObj = new JSONObject();
@@ -155,9 +213,32 @@ public class TransactionInfo{
         catch (IOException x) {
             System.err.println(x);
         }
+
+        // Now let's write to the allTransactionsPath
+
+        JSONObject obj = new JSONObject();
+
+        JSONArray txnTimes = new JSONArray();
+
+        for(int i = 0; i< transactionTimes.size(); i++){
+            txnTimes.add(transactionTimes.get(i));
+        }
+
+        obj.put("transactionTimes", txnTimes);
+
+        Path outputPath = Paths.get(allTransactionsPath);
+        byte[] outputData = obj.toJSONString().getBytes();
+
+        try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(outputPath))){
+            out.write(outputData, 0, outputData.length);
+        }
+        catch (IOException x) {
+            System.err.println(x);
+        }
+
     }
 
-    public boolean readFromJsonFile(String path){
+    public boolean readFromJsonFile(String path, String allTransactionsPath){
         JSONParser parser = new JSONParser();
 
         try (Reader reader = new FileReader(path)) {
@@ -185,11 +266,31 @@ public class TransactionInfo{
             totalTransactionTime = (Long) (jsonObject.get("totalTransactionTime"));
             numEpochs = ((Number) jsonObject.get("numEpochs")).intValue();
 
+            // Now read in from all transactions path
+
+            Reader reader2 = new FileReader(allTransactionsPath);
+
+            jsonObject = (JSONObject) parser.parse(reader2);
+
+            JSONArray allTransactions = (JSONArray) jsonObject.get("transactionTimes");
+
+            transactionTimes.clear();
+
+            for(int i = 0; i< allTransactions.size(); i++){
+                transactionTimes.add((Long) allTransactions.get(i));
+            }
+
+            Collections.sort(transactionTimes);
+            isSorted = true;
+
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ParseException e) {
             e.printStackTrace();
         }
+
+
+
 
         return true;
     } 
