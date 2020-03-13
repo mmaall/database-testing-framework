@@ -16,6 +16,7 @@ CREATE TABLE products(
     category        VARCHAR(50),
     price           DECIMAL(15,4),
     description     VARCHAR(1000),
+    quantity        INT,
     posting_date    DATE 
 );
 
