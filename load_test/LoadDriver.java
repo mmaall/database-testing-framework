@@ -9,26 +9,23 @@ class LoadDriver{
 
         // Argument information
 
-        // [db_url, username, password, dataSize, testType, machineID, testLength, numThreads] 
-
-
+        // [db_url, username, password, testType, machineID, testLength, numThreads] 
         // Test length is in minutes
+
         // Database info
 
 
-        /*
-        String databaseUrl = args[0];
+        String databaseUrl = "jdbc:mysql://"+args[0];
         String userName = args[1];
         String password = args[2];
         String testType = args[3];
-        byte machineID = (byte) Integer.parseInt(args[3]);
-        String infoFile = "./" + testType + "selectedIDs.json";
+        byte machineID = (byte) Integer.parseInt(args[4]);
+        String infoFile = "./" + testType + "SelectedIDs.json";
         // minutes, seconds, milliseconds
-        long testLength = Integer.parseInt(args[4]) * 60 * 1000; 
+        long testLength = Integer.parseInt(args[5]) * 60 * 1000; 
 
-        int numThreads = Integer.parseInt(args[5]);
-        */
-
+        int numThreads = Integer.parseInt(args[6]);
+        /*
 
         String testType = "mini";
         String databaseUrl = "jdbc:mysql://localhost/rocks_db_test_db";
@@ -39,6 +36,8 @@ class LoadDriver{
         long testLength = 60 * 60 * 1000;
         int numThreads = 4; 
         byte machineID = (byte) 0;
+        */ 
+
         String fullUrl = databaseUrl+"?user="+userName+"&password="+password;
 
 

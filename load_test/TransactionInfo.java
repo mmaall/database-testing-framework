@@ -77,7 +77,8 @@ public class TransactionInfo{
         int epoch = (int) ((txnStartTime - startTime) / (1000 * 60) );
         //System.out.println(epoch); 
         if (numEpochs <= epoch){
-            System.err.println("ERROR: Epoch " + epoch + "for txn starting at " + 
+            System.err.println("ERROR: TransactionInfo: Epoch " + epoch + 
+                                "for txn starting at " + 
                                     txnStartTime +"exceeds number of valid epochs");
             return;
         } 
@@ -306,7 +307,7 @@ public class TransactionInfo{
                 }
             }
             catch(Exception e){
-                System.err.println("ERROR: Error reading in percentile info");
+                System.err.println("ERROR: TransactionInfo: Error reading in percentile info");
                 System.err.println(e.toString());
             }
 

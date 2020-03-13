@@ -93,7 +93,7 @@ class DatabaseThread extends Thread{
             conn.setAutoCommit(false);
         }
         catch(SQLException e){
-            System.err.println("ERROR: Unable to connect to " + dbUrl);
+            System.err.println("ERROR: DatabaseThread: Unable to connect to " + dbUrl);
             System.err.println(e.toString());
             System.exit(-1);
         }
@@ -172,7 +172,8 @@ class DatabaseThread extends Thread{
 
         }
         catch(Exception e){
-            System.err.println("ERROR: Unable to set up prepared statements");
+            System.err.println("ERROR: DatabaseThread: Unable to set up "+
+                                "prepared statements");
             System.err.println(e.toString());
         }
     }
@@ -207,7 +208,7 @@ class DatabaseThread extends Thread{
 
         }
         catch(SQLException e){
-            System.err.println("ERROR: Sql exception during query.");
+            System.err.println("ERROR: DatabaseThread: Sql exception during query.");
             System.err.println(e.toString());
         }
 
@@ -316,7 +317,7 @@ class DatabaseThread extends Thread{
                     numTransactions++;
                 }
                 catch(SQLException e){
-                    System.err.println("ERROR: Sql exception during query.");
+                    System.err.println("ERROR: DatabaseThread: Sql exception during query.");
                     System.err.println(e.toString());
                 }
 
@@ -357,7 +358,7 @@ class DatabaseThread extends Thread{
 
                 }
                 catch(SQLException e){
-                    System.err.println("ERROR: Sql exception during query.");
+                    System.err.println("ERROR: DatabaseThread: Sql exception during query.");
                     System.err.println(e.toString());
                 }
 
@@ -445,7 +446,7 @@ class DatabaseThread extends Thread{
 
                 }
                 catch(SQLException e){
-                    System.err.println("ERROR: Sql exception during query.");
+                    System.err.println("ERROR: DatabaseThread: Sql exception during query.");
                     System.err.println(e.toString());
                 }
 
@@ -486,7 +487,7 @@ class DatabaseThread extends Thread{
 
                 }
                 catch(SQLException e){
-                    System.err.println("ERROR: Sql exception during query.");
+                    System.err.println("ERROR: DatabaseThread: Sql exception during query.");
                     System.err.println(e.toString());
                 }
 
