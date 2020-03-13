@@ -70,7 +70,6 @@ class RecordInfo{
         try (Reader reader = new FileReader(filePath)) {
 
             JSONObject jsonObject = (JSONObject) parser.parse(reader);
-            System.out.println(jsonObject);
 
             JSONArray customerObj = (JSONArray) jsonObject.get("customers");
 

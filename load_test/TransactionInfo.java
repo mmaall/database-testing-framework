@@ -133,7 +133,7 @@ public class TransactionInfo{
         for(int i = 0; i < percentiles.length; i++){
 
             long timeSum = 0;
-            int numberOfTransactions = (int) (sizeTxnTimes * (1-percentiles[i]));
+            int numberOfTransactions = (int) (sizeTxnTimes * (1-percentiles[i]))+1;
             int startingPosition = sizeTxnTimes - numberOfTransactions;
 
             for (int j = startingPosition; j < sizeTxnTimes; j++){

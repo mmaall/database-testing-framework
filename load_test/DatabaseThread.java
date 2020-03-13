@@ -88,9 +88,11 @@ class DatabaseThread extends Thread{
 
         // Set up connection
         try{
+            System.out.println("Attempting connection to "+databaseUrl);
             conn = DriverManager.getConnection(dbUrl);
             // Turning off autocommit 
             conn.setAutoCommit(false);
+            System.out.println("DB Connection Acquired");
         }
         catch(SQLException e){
             System.err.println("ERROR: DatabaseThread: Unable to connect to " + dbUrl);
@@ -169,7 +171,7 @@ class DatabaseThread extends Thread{
             // findOrderAfterDate = conn.prepareStatement(findOrderAfterDate_str);
             // findOrderBetweenDate = conn.prepareStatement(findOrderBeforeDate_str);
             insertOrder = conn.prepareStatement(insertOrder_str);
-
+            System.out.println("All statements prepared");
         }
         catch(Exception e){
             System.err.println("ERROR: DatabaseThread: Unable to set up "+
@@ -184,47 +186,7 @@ class DatabaseThread extends Thread{
 
         // Test query
 
-        String d1 = createRandomDate(2000, 2010).toString();
-        String d2 = createRandomDate(2010, 2020).toString();
-
-        try{
-
-            findProductBetweenDate.setString(1, d1);
-            findProductBetweenDate.setString(2, d2);
-
-            // Start executing
-            long txnTime = System.currentTimeMillis();
-            // Get the customer info 
-            ResultSet rset = findProductBetweenDate.executeQuery();
-            
-            conn.commit();
-
-            // Deal with the result set
-
-            while(rset.next()){
-                long productUID = rset.getLong(1);
-                //System.out.println("Product UID: " + productUID); 
-            }
-
-        }
-        catch(SQLException e){
-            System.err.println("ERROR: DatabaseThread: Sql exception during query.");
-            System.err.println(e.toString());
-        }
-
-
-
-
         //System.exit(-1);
-
-        // Let's do some real stuff
-        long threadStartTime = System.currentTimeMillis();
-
-        long threadEndTime = threadStartTime + threadRuntime; 
-
-        long totalTransactionTime = 0;
-
-        int numTransactions = 0; 
 
 
         // UID information holders, holds uids and is a queue. We will be making requests from the queue. 
@@ -247,12 +209,23 @@ class DatabaseThread extends Thread{
             System.err.println(e.toString());
             return;
         }
+        System.out.println("UniqueIDGenerator Generated");
+
+
+        // Let's do some real stuff
+        long threadStartTime = System.currentTimeMillis();
+
+        long threadEndTime = threadStartTime + threadRuntime; 
+
+        long totalTransactionTime = 0;
+
+        int numTransactions = 0; 
 
         txnInfo = new TransactionInfo(System.currentTimeMillis(), numEpochs);
-
+        System.out.println("Transactions starting");
         // Run this thread for the predetirmined amount of time. 
         while(System.currentTimeMillis() < threadEndTime){
-
+            System.out.println("Executing transaction");
             // Let's start executing queries 
 
             // Generate a number between 1 and 100 
@@ -262,7 +235,7 @@ class DatabaseThread extends Thread{
             // Get a customer's information, get orders for that customer
             // Uses the hot records provided on this machine
             if(randomInt < 25){
-
+                System.out.println("Get customer info, order something");
                 int randomVal = (int) (Math.random()*2);
                 //System.out.println("Rand val: " + randomVal);
                 long uid;
@@ -325,6 +298,7 @@ class DatabaseThread extends Thread{
 
             // Increase the inventory of an item
             else if (randomInt >= 98){
+                System.out.println("Increase inventory");
 
                 int randomVal = (int) (Math.random()*2);
 
@@ -369,7 +343,7 @@ class DatabaseThread extends Thread{
             // Order one of those products
             else if (25<= randomInt && randomInt < 75){
 
-
+                System.out.println("Customer info, ask about 10 products, order one");
                 int randomVal = (int) (Math.random()*2);
                 //System.out.println("Rand val: " + randomVal);
                 long customerUID;
@@ -453,10 +427,10 @@ class DatabaseThread extends Thread{
 
             }
 
-
+            /*
             // Get the products in a date range 
             else if(75<= randomInt && randomInt < 98){
-
+                System.out.println("Product id by date range");
                 String date1 = createRandomDate(2000, 2010).toString();
                 String date2 = createRandomDate(2010, 2020).toString();
 
@@ -483,7 +457,7 @@ class DatabaseThread extends Thread{
                     totalTransactionTime += txnTime;
                     numTransactions++;
 
-
+                    System.out.println(totalTransactionTime);
 
                 }
                 catch(SQLException e){
@@ -493,6 +467,7 @@ class DatabaseThread extends Thread{
 
 
             }
+            */
 
         }
 

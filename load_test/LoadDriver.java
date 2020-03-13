@@ -53,6 +53,8 @@ class LoadDriver{
             String threadName = "thread"+i;
             threadArray.add(new DatabaseThread(threadName, fullUrl, selectedRecordInfo, machineID, (byte) i, testLength));
             threadArray.get(i).start();
+            System.out.println("Thread started");            
+             
         }
 
         /*
