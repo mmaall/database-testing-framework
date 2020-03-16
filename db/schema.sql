@@ -27,3 +27,5 @@ CREATE TABLE orders(
     quantity        INT,
     purchase_time   TIMESTAMP 
 );
+
+CREATE INDEX customer_index ON orders (customer_id, order_id); 
