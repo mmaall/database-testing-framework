@@ -1,2 +1,3 @@
-# Performance Testing MyRocks 
-Testing MyRocks on a customer-orders style workload. 
+# Database Testing Framework
+
+Aiming to test differences in scale between DynamoDB and some form of relational db. 
