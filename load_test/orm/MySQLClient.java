@@ -58,9 +58,39 @@ public class MySQLClient implements DatabaseClient{
 
     public Customer getCustomer(long uid){
 
+        // Supply UID to prepared statment 
+        try{
+            queryCustomerByUID.setLong(1, uid);
+        }
+        catch (SQLException e){
+            System.err.println("ERROR: Issue setting " + uid + " in prepared statement");
+            System.err.println(e.toString());
+        }
+       
+        // Run query  
+        ResultSet rset = null; 
+
+        try{
+            rset = queryCustomerByUID.executeQuery();
+        }
+        catch (SQLException e){
+            System.err.println("ERROR: Issue running query for customer " + uid);
+            System.err.println(e.toString());
+        }
 
 
-        return new Customer();
+        // Unpack and create customer object 
+        Customer customer = null;
+
+        try {
+            customer = new Customer(rset.getLong(1), rset.getString(2), rset.getString(3), rset.getInt(4));
+        }
+        catch (SQLException e){
+            System.err.println("ERROR: Issue unpacking customer " + uid + " result set");
+            System.err.println(e.toString());
+        }
+
+        return customer;
     }
 
     public ArrayList<Order> getCustomerOrders(long uid){
