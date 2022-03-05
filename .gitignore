@@ -24,5 +24,10 @@ hs_err_pid*
 
 rocks.sublime-project
 
+# Python items
+__pycache__/
+*.pyc
+scheduler-env/
+
 # Holds system identifiers and passwords stuff. Would be bad if that got out right?
 .systeminfo
