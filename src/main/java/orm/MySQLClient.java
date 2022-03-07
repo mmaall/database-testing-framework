@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.sql.*;
 
 
-// Client to access MySQL Database
+// Client to access necessary data within MySQL 
 public class MySQLClient implements DatabaseClient{
 
     // Database information 
@@ -52,7 +52,6 @@ public class MySQLClient implements DatabaseClient{
     }
 
     public void createCustomer(Customer customer){
-
 
     }
 

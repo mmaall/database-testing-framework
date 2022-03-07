@@ -1,5 +1,5 @@
 
-package data_generation; 
+package data_generator; 
 
 // Class to generate unique identifiers
 
@@ -56,7 +56,6 @@ public class UniqueIDGenerator{
     // Also takes in a process ID, this identifies which process that is being used 
 
     public UniqueIDGenerator(byte systemID, byte processID) throws InvalidValueException{
-        // Finds the ipAddress so we only have to do it once  
 
         boolean invalidID =false;
 

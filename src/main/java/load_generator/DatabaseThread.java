@@ -1,13 +1,15 @@
+
+package load_generator;
+
 import java.sql.*;
 import java.util.ArrayList;
-import data_generation.*;
+import data_generator.*;
 import java.util.Random;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 
-
-class DatabaseThread extends Thread{
+public class DatabaseThread extends Thread{
     // Name of the thread  
     private String threadName;
     private int count;
@@ -74,7 +76,7 @@ class DatabaseThread extends Thread{
     //Constructor 
 
     // Thread runtime is in milliseconds 
-    DatabaseThread(String name, String databaseUrl, RecordInfo recordInfo, byte systemID, byte threadID, long threadRuntime) {
+    public DatabaseThread(String name, String databaseUrl, RecordInfo recordInfo, byte systemID, byte threadID, long threadRuntime) {
 
         System.out.println("Creating " +  name);
         threadName = name;

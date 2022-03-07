@@ -1,7 +1,7 @@
 
 /*
 
-package orm;
+package load_generator.orm;
 
 import orm.DatabaseClient;
 import orm.Customer;

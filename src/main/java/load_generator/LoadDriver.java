@@ -1,8 +1,13 @@
 
 
 import java.util.ArrayList;
+import orm.MySQLClient;
+import load_generator.DatabaseThread;
+import load_generator.RecordInfo;
+import load_generator.TransactionInfo;
 
-class LoadDriver{
+
+public class LoadDriver{
 
     public static void main(String args[]){
         
@@ -41,7 +46,8 @@ class LoadDriver{
         String fullUrl = databaseUrl+"?user="+userName+"&password="+password;
 
 
-
+        // Setup database client 
+        MySQLClient dbClient = new MySQLClient("test", "test", "test", "test");
 
 
         RecordInfo selectedRecordInfo = new RecordInfo(infoFile);

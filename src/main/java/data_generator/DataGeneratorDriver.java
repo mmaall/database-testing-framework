@@ -11,9 +11,12 @@ import java.text.SimpleDateFormat;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import data_generation.UniqueIDGenerator;
+import data_generator.InvalidValueException;
+import data_generator.StringGenerator;
+import data_generator.UniqueIDGenerator;
 
-class DataGenerator{
+class DataGeneratorDriver{
+
 
     public static final int BIGINT = 0;
     public static final int INT = 1;
@@ -23,13 +26,13 @@ class DataGenerator{
     public static final int TIMESTAMP = 5;
 
 
-
-
     public static void main(String[] args){
 
+        System.out.println("Hello, container!");
 
         // Holds the number of rows in each test
-        int[] rowsPerTest = {100,10600000, 18000000, 35000000};
+        //int[] rowsPerTest = {100,10600000, 18000000, 35000000};
+        int[] rowsPerTest = {100, 100, 100, 100};
         // Holds all the headers of the files  
         String[] fileHeaders = {"mini","small" , "medium", "large"};
 

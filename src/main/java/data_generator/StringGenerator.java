@@ -1,7 +1,9 @@
 
+package data_generator; 
+
 import java.lang.Math;
 
-class StringGenerator{
+public class StringGenerator{
 
 
     //Padding it with spaces makes it look more like sentences

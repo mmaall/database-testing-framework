@@ -1,4 +1,6 @@
 
+package load_generator;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -10,8 +12,7 @@ import java.io.Reader;
 import java.util.Iterator;
 import java.util.Arrays;
 
-
-class RecordInfo{
+public class RecordInfo{
 
     private String filePath; 
 

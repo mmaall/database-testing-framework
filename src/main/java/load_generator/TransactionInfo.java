@@ -1,4 +1,6 @@
 
+package load_generator;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import static java.nio.file.StandardOpenOption.*;
@@ -16,6 +18,7 @@ import java.util.Arrays;
 
 import java.util.ArrayList;
 import java.util.Collections;
+
 
 public class TransactionInfo{
 
