@@ -1,7 +1,7 @@
 
-CREATE DATABASE IF NOT EXISTS rocks_db_test_db;
+CREATE DATABASE IF NOT EXISTS orders_db;
 
-USE rocks_db_test_db;
+USE orders_db;
 
 CREATE TABLE customers(
     customer_id     BIGINT PRIMARY KEY,
@@ -23,9 +23,13 @@ CREATE TABLE products(
 CREATE TABLE orders(
     order_id        BIGINT PRIMARY KEY,
     customer_id     BIGINT,
-    product_id      BIGINT,
-    quantity        INT,
     purchase_time   TIMESTAMP 
+);
+
+CREATE TABLE orders_products(
+    order_id        BIGINT PRIMARY KEY,
+    product_id      BIGINT,
+    quantity        INT
 );
 
 CREATE INDEX customer_index ON orders (customer_id, order_id); 

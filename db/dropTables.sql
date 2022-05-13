@@ -1,6 +1,4 @@
-USE rocks_db_test_db;
-
-
+USE orders_db; 
 
 DROP INDEX customer_index on orders;
 
