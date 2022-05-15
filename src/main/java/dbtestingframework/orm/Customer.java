@@ -1,25 +1,30 @@
 
 package orm;
 
+import java.util.ArrayList;
+
 public class Customer{
 
     private long uid;
     private String name;
-    private String address;
-    private int age;
+    private ArrayList<String> addresses;
 
 
     public Customer(){
 
     }
 
-    public Customer(long uid, String name, String address, int age){
+    public Customer(long uid, String name){
 
         this.uid = uid;
         this.name = name;
-        this.address = address;
-        this.age = age; 
+        this.addresses = new ArrayList<String>();
 
+    }
+
+    public Customer(long uid, String name, ArrayList<String> addresses){
+        this(uid, name);
+        this.addresses = addresses;
     }
 
     public long getUID(){
@@ -38,19 +43,12 @@ public class Customer{
         this.name = name;
     }
 
-    public String getAddress(){
-        return this.address;
+    public ArrayList<String> getAddresses(){
+        return this.addresses;
     }
 
-    public void setAddress(String address){
-        this.address = address;
-    }
-    public int getAge(){
-        return this.age;
-    }
-
-    public void setAge(int age){
-        this.age = age;
+    public void addAddress(String address){
+        this.addresses.add(address);
     }
 
 

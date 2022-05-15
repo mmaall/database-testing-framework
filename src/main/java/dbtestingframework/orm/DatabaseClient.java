@@ -6,15 +6,12 @@ import java.util.ArrayList;
 public interface DatabaseClient{
 
     // Customer access 
-    void createCustomer(Customer customer);
+    void createCustomer(Customer customer) throws DatabaseClientException;
 
-    Customer getCustomer(long uid);
-    ArrayList<Order> getCustomerOrders(long uid);
-
-    // Item access
-    //void getProduct(long uid);
+    //Customer getCustomer(long uid);
+    //ArrayList<Order> getOrders(long customerUID);
 
     // Orders 
-    //void getOrder(long uid);
-    //void addOrder(long orderUID, long customerUID, long productUID, int amount);
+    //void createOrder(Order order);
+    //void getOrder(long orderUID, long customerUID);
 }

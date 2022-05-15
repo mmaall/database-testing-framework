@@ -21,6 +21,7 @@ public class MySQLClient implements DatabaseClient{
 
     public MySQLClient(String dbUrl, String dbName, String username, String password){
         
+        /*
         this.jdbcString = "jdbc:mysql://" + dbUrl + "?user=" + username + "&password=" + password;
         this.dbName = dbName;
 
@@ -49,12 +50,14 @@ public class MySQLClient implements DatabaseClient{
                                 "prepared statements");
             System.err.println(e.toString());
         }
+        */
     }
 
     public void createCustomer(Customer customer){
 
     }
 
+    /*
     public Customer getCustomer(long uid){
 
         // Supply UID to prepared statment 
@@ -98,5 +101,6 @@ public class MySQLClient implements DatabaseClient{
 
         return orders;
     }
+    */
 }
 
