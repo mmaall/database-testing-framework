@@ -11,6 +11,9 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.regions.Region;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.ArrayList;
+
 
 public class DynamoClient implements DatabaseClient{
 
@@ -55,10 +58,67 @@ public class DynamoClient implements DatabaseClient{
         }
     }
 
+    public Customer getCustomer(long uid) throws DatabaseClientException{
+
+        HashMap<String, AttributeValue> searchKeys = 
+            new HashMap<String, AttributeValue>();
+
+        searchKeys.put("pk", new AttributeValue(getCustomerPK(uid)));
+        searchKeys.put("sk", new AttributeValue(getCustomerSK(uid)));
+
+        GetItemRequest request = new GetItemRequest()
+            .withKey(searchKeys)
+            .withTableName(this.tableName);
+
+        String name = "";
+        ArrayList<String> addresses = null;
+
+        try {
+            Map<String,AttributeValue> returnedItems =
+                ddb.getItem(request).getItem();
+
+            if (returnedItems != null) {
+                // Read in items
+                name = returnedItems.get("name").getS();
+
+                if (returnedItems.containsKey("addresses")){
+                    addresses = new ArrayList<String>(returnedItems.get("addresses").getSS());
+                }
+
+            } else {
+                // No items found, not ideal 
+                System.out.println("No item found with the key! " + uid );
+                return null;
+            }
+
+        } catch (AmazonServiceException e) {
+            throw new DatabaseClientException(e.getErrorMessage());
+        }
+
+        if (addresses == null){
+            return new Customer(uid, name);
+        }
+        
+        return new Customer(uid, name, addresses);
+
+    }
+
     private String getCustomerPK(long uid){
         return "customer#" + String.valueOf(uid);
     }
     private String getCustomerSK(long uid){
         return getCustomerPK(uid);
+    }
+
+    private long parseCustomerPK(String pk){
+        return Long.parseLong(stripKeyHeader(pk));
+    }
+    private long parseCustomerSK(String sk){
+        return parseCustomerPK(sk);
+    }
+
+    // Get the string after the # for dynamodb primary keys
+    private String stripKeyHeader(String key){
+        return key.substring(key.indexOf("#"));
     }
 }

@@ -6,7 +6,7 @@ import java.sql.*;
 
 
 // Client to access necessary data within MySQL 
-public class MySQLClient implements DatabaseClient{
+public class MySQLClient{
 
     // Database information 
     private String jdbcString; 
@@ -53,8 +53,12 @@ public class MySQLClient implements DatabaseClient{
         */
     }
 
-    public void createCustomer(Customer customer){
+    public void createCustomer(Customer customer) throws DatabaseClientException{
 
+    }
+
+    public Customer getCustomer(long uid) throws DatabaseClientException{
+        return new Customer();
     }
 
     /*

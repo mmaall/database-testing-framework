@@ -25,7 +25,7 @@ These are HTTP Servers that hosts a Rest API to manage load testing. Can accept 
 ### Load Testing
 An HTTP POST by the scheduler with duration can trigger the container to generate load/transactions to the database that is being tested. 
 
-## Data Generation
+### Data Generation
 Generates synthetic data that is going to be used in the database being load tested. Triggered by an HTTP POST which includes the amount of data being generated as well as the db driver to use 
 
 # TODOS
