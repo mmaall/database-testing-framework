@@ -5,27 +5,28 @@ Aiming to test differences in scale between DynamoDB and some form of relational
 
 # Setup
 
-Required packages
-- JSON Simple: https://code.google.com/archive/p/json-simple/downloads
-- MySQL Connector: https://dev.mysql.com/downloads/connector/j/
-Upon downloading ensure they are added to the CLASSPATH.
+Now using Maven so can manually run maven yourself or take advantage of the Makefile to build source code.
+
+Infrastructure deployments can be done using the scheduler python script. 
 
 # Usage
 
 
 # Components
 
-#### Scheduler 
+## Scheduler 
 
 Command line utility to start and aggregate the results of a database load testing job. 
 
-#### Load Generators
+## Container Load Testers
 
-These will generate load/transactions to the databse that is being tested. Lives in containers in ECS tasks and will be started/stopped by the scheduler. 
+These are HTTP Servers that hosts a Rest API to manage load testing. Can accept methods for generating data, starting load testing, getting load test information. Lives in containers in ECS tasks and will be started/stopped by the scheduler. 
 
-#### Data Generators
+### Load Testing
+An HTTP POST by the scheduler with duration can trigger the container to generate load/transactions to the database that is being tested. 
 
-Generates synthetic data that is going to be used in the database being load tested. These will be started as containers in ECS tasks. This will be kicked off by the scheduler. 
+## Data Generation
+Generates synthetic data that is going to be used in the database being load tested. Triggered by an HTTP POST which includes the amount of data being generated as well as the db driver to use 
 
 # TODOS
 
@@ -34,6 +35,9 @@ Generates synthetic data that is going to be used in the database being load tes
 ## Write DB clients
 - MySQL
 - Dynamo
+    - Happy w/ secondary indexes
+    - Less happy w/ scans 
+    - Less happy w/ manual joins (maybe?)
 
 ## Determine proportions
 - How many TPS
