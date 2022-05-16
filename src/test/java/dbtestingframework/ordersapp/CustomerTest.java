@@ -1,4 +1,4 @@
-package orm;
+package ordersapp;
 
 import static org.junit.Assert.assertTrue;
 

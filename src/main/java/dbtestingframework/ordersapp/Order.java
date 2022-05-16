@@ -1,5 +1,5 @@
 
-package orm;
+package ordersapp;
 
 public class Order{
 

@@ -1,5 +1,5 @@
 
-package orm; 
+package ordersapp.dbclients; 
 
 // Exception to handle when invalid values are supplied 
 public class DatabaseClientException extends Exception {

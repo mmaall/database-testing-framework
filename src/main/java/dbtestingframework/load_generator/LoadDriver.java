@@ -1,7 +1,7 @@
 
 
 import java.util.ArrayList;
-import orm.MySQLClient;
+import ordersapp.dbclients.MySQLClient;
 import load_generator.DatabaseThread;
 import load_generator.RecordInfo;
 import load_generator.TransactionInfo;

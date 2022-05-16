@@ -1,5 +1,5 @@
 
-package orm;
+package ordersapp;
 
 import java.util.ArrayList;
 

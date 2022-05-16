@@ -1,8 +1,10 @@
 
-package orm;
+package ordersapp.dbclients;
 
 import java.util.ArrayList;
 import java.sql.*;
+
+import ordersapp.*;
 
 
 // Client to access necessary data within MySQL 

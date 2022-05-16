@@ -1,5 +1,5 @@
 
-package orm;
+package ordersapp.dbclients;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.ArrayList;
+
+import ordersapp.*;
 
 
 public class DynamoClient implements DatabaseClient{
@@ -102,6 +104,9 @@ public class DynamoClient implements DatabaseClient{
         return new Customer(uid, name, addresses);
 
     }
+
+
+    // Helper Functions
 
     private String getCustomerPK(long uid){
         return "customer#" + String.valueOf(uid);

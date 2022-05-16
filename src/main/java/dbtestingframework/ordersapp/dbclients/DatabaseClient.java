@@ -1,7 +1,8 @@
 
-package orm;
+package ordersapp.dbclients;
 
 import java.util.ArrayList;
+import ordersapp.*;
 
 public interface DatabaseClient{
 
