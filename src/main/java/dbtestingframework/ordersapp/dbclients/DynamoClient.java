@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.ArrayList;
+import java.util.Date;
 
 import ordersapp.*;
 
@@ -89,7 +90,6 @@ public class DynamoClient implements DatabaseClient {
 
             } else {
                 // No items found, not ideal
-                System.out.println("No item found with the key! " + uid );
                 return null;
             }
 
@@ -121,6 +121,45 @@ public class DynamoClient implements DatabaseClient {
             System.err.println(e.getMessage());
             throw new DatabaseClientException(e.getMessage());
         }
+    }
+
+    public Order getOrder(long orderUID, long customerUID) throws DatabaseClientException {
+
+        HashMap<String, AttributeValue> searchKeys =
+            new HashMap<String, AttributeValue>();
+
+        searchKeys.put("pk", new AttributeValue(getCustomerPK(customerUID)));
+        searchKeys.put("sk", new AttributeValue(getOrderSK(orderUID)));
+
+        GetItemRequest request = new GetItemRequest()
+        .withKey(searchKeys)
+        .withTableName(this.tableName);
+
+        Order order = null;
+
+        try {
+            Map<String, AttributeValue> returnedItems =
+                ddb.getItem(request).getItem();
+
+            if (returnedItems != null) {
+
+                order = new Order(
+                    orderUID,
+                    customerUID,
+                    new Date(Long.parseLong(returnedItems.get("createDate").getS())),
+                    returnedItems.get("address").getS());
+
+
+            } else {
+                // No items found, not ideal
+                return null;
+            }
+
+        } catch (AmazonServiceException e) {
+            throw new DatabaseClientException(e.getErrorMessage());
+        }
+
+        return order;
     }
 
 

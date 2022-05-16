@@ -64,16 +64,36 @@ public class DynamoTesting {
         System.out.println("Create Order Test");
 
         for (int i = 0; i < 10; i++){
-            Order order = new Order(i, i, new Date(), "addr" + i);
+            Order newOrder = new Order(i, i, new Date(), "addr" + i);
             try{
-                client.createOrder(order);
+                client.createOrder(newOrder);
             } catch (DatabaseClientException e){
                 System.err.println("ERROR: Issue creating an order");
                 System.err.println(e.getDetails());
                 errorCount +=1;
                 continue;
             }
+
+            try{
+                Order foundOrder = client.getOrder(i, i);
+
+                if (!newOrder.getAddress().equals(foundOrder.getAddress())){
+                    System.err.println("ERROR: Orders addresses not matching");
+                    errorCount += 1;
+                }
+                else if (newOrder.getCreateDate().getTime() != foundOrder.getCreateDate().getTime()){
+                    System.err.println("ERROR: Orders times not matching");
+                    errorCount +=1; 
+                }
+
+            } catch (DatabaseClientException e){
+                System.err.println("ERROR: Issue getting an order");
+                System.err.println(e.getDetails());
+                errorCount +=1;
+                continue;
+            }
         }
+
 
         System.out.println("Exiting with " + errorCount + " errors");
     }

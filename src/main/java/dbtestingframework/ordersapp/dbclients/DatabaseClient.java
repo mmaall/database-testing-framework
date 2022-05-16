@@ -14,5 +14,5 @@ public interface DatabaseClient {
 
     // Orders
     void createOrder(Order order) throws DatabaseClientException;
-    //void getOrder(long orderUID, long customerUID);
+    Order getOrder(long orderUID, long customerUID) throws DatabaseClientException;
 }
