@@ -26,7 +26,8 @@ public class Order {
         return this.orderUID;
     }
 
-    public long getUserUID() {
+
+    public long getCustomerUID() {
         return this.customerUID;
     }
 

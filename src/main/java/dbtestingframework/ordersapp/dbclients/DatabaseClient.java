@@ -13,6 +13,6 @@ public interface DatabaseClient {
     //ArrayList<Order> getOrders(long customerUID);
 
     // Orders
-    //void createOrder(Order order);
+    void createOrder(Order order) throws DatabaseClientException;
     //void getOrder(long orderUID, long customerUID);
 }

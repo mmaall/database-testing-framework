@@ -105,6 +105,24 @@ public class DynamoClient implements DatabaseClient {
 
     }
 
+    public void createOrder(Order order) throws DatabaseClientException {
+        HashMap<String, AttributeValue> itemValues =
+            new HashMap<String, AttributeValue>();
+
+        itemValues.put("pk", new AttributeValue(getCustomerPK(order.getCustomerUID())));
+        itemValues.put("sk", new AttributeValue(getOrderSK(order.getOrderUID())));
+        itemValues.put("address", new AttributeValue(order.getAddress()));
+        // Converts date to a long here
+        itemValues.put("createDate", new AttributeValue(String.valueOf(order.getCreateDate().getTime())));
+
+        try {
+            this.ddb.putItem(this.tableName, itemValues);
+        } catch (AmazonServiceException e) {
+            System.err.println(e.getMessage());
+            throw new DatabaseClientException(e.getMessage());
+        }
+    }
+
 
     // Helper Functions
 
@@ -120,6 +138,10 @@ public class DynamoClient implements DatabaseClient {
     }
     private long parseCustomerSK(String sk) {
         return parseCustomerPK(sk);
+    }
+
+    private String getOrderSK(long uid) {
+        return "order#" + String.valueOf(uid);
     }
 
     // Get the string after the # for dynamodb primary keys
