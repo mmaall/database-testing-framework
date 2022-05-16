@@ -7,27 +7,27 @@ import java.sql.*;
 import ordersapp.*;
 
 
-// Client to access necessary data within MySQL 
-public class MySQLClient{
+// Client to access necessary data within MySQL
+public class MySQLClient {
 
-    // Database information 
-    private String jdbcString; 
-    private Connection dbConnection; 
-    private String dbName; 
+    // Database information
+    private String jdbcString;
+    private Connection dbConnection;
+    private String dbName;
 
 
 
-    // Prepared statements 
+    // Prepared statements
     private PreparedStatement queryCustomerByUID;
 
 
-    public MySQLClient(String dbUrl, String dbName, String username, String password){
-        
+    public MySQLClient(String dbUrl, String dbName, String username, String password) {
+
         /*
         this.jdbcString = "jdbc:mysql://" + dbUrl + "?user=" + username + "&password=" + password;
         this.dbName = dbName;
 
-        // Setup database connection 
+        // Setup database connection
 
         try{
             System.out.println("Establishing connection to " + jdbcString);
@@ -55,18 +55,18 @@ public class MySQLClient{
         */
     }
 
-    public void createCustomer(Customer customer) throws DatabaseClientException{
+    public void createCustomer(Customer customer) throws DatabaseClientException {
 
     }
 
-    public Customer getCustomer(long uid) throws DatabaseClientException{
+    public Customer getCustomer(long uid) throws DatabaseClientException {
         return new Customer();
     }
 
     /*
     public Customer getCustomer(long uid){
 
-        // Supply UID to prepared statment 
+        // Supply UID to prepared statment
         try{
             queryCustomerByUID.setLong(1, uid);
         }
@@ -74,9 +74,9 @@ public class MySQLClient{
             System.err.println("ERROR: Issue setting " + uid + " in prepared statement");
             System.err.println(e.toString());
         }
-       
-        // Run query  
-        ResultSet rset = null; 
+
+        // Run query
+        ResultSet rset = null;
 
         try{
             rset = queryCustomerByUID.executeQuery();
@@ -87,7 +87,7 @@ public class MySQLClient{
         }
 
 
-        // Unpack and create customer object 
+        // Unpack and create customer object
         Customer customer = null;
 
         try {

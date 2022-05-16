@@ -16,7 +16,7 @@ public class DataGeneratorServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    throws ServletException, IOException {
 
         System.out.println("Content type: " + request.getContentType());
         System.out.println("Parameter Map: " + request.getParameterMap().toString());

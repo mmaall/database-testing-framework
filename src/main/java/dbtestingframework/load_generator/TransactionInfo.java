@@ -20,14 +20,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 
-public class TransactionInfo{
+public class TransactionInfo {
 
 
     // total time spent during transactions in an epoch
     private long[] transactionTimePerEpoch;
     // the total number of transactions completed in an epoch
     private long[] totalNumTransactionsPerEpoch;
-    // Holds the transaction times, yes all of them 
+    // Holds the transaction times, yes all of them
 
     // Can tell whether transactions are sorted
     private boolean isSorted = false;
@@ -38,11 +38,11 @@ public class TransactionInfo{
 
     private int totalNumTransactions;
 
-    private String tag; 
+    private String tag;
 
     private long startTime;
     //Holds the number of epochs we will handle.
-    //An epoch is by default 60 seconds 
+    //An epoch is by default 60 seconds
     private int numEpochs;
 
     // holds average transaction times
@@ -51,12 +51,12 @@ public class TransactionInfo{
 
     private double[] percentiles = {.5, .99, .999};
 
-    public TransactionInfo(){
+    public TransactionInfo() {
 
     }
 
     // Create TransactionInfo Object by reading the file defined by the path
-    public TransactionInfo(String path, String allTransactionsPath){
+    public TransactionInfo(String path, String allTransactionsPath) {
 
         transactionTimes = new ArrayList<Long>();
 
@@ -64,9 +64,9 @@ public class TransactionInfo{
 
     }
 
-    public TransactionInfo(long startTime, int numEpochs){
+    public TransactionInfo(long startTime, int numEpochs) {
         this.startTime = startTime;
-        this.numEpochs = numEpochs; 
+        this.numEpochs = numEpochs;
 
         transactionTimePerEpoch = new long[numEpochs];
         totalNumTransactionsPerEpoch = new long[numEpochs];
@@ -75,22 +75,22 @@ public class TransactionInfo{
         transactionTimes = new ArrayList<Long>();
     }
 
-    public void addTransaction(long txnStartTime, long txnEndTime){
-        // Figure out the epoch 
+    public void addTransaction(long txnStartTime, long txnEndTime) {
+        // Figure out the epoch
         int epoch = (int) ((txnStartTime - startTime) / (1000 * 60) );
-        //System.out.println(epoch); 
-        if (numEpochs <= epoch){
-            System.err.println("ERROR: TransactionInfo: Epoch " + epoch + 
-                                "for txn starting at " + 
-                                    txnStartTime +"exceeds number of valid epochs");
+        //System.out.println(epoch);
+        if (numEpochs <= epoch) {
+            System.err.println("ERROR: TransactionInfo: Epoch " + epoch +
+                               "for txn starting at " +
+                               txnStartTime + "exceeds number of valid epochs");
             return;
-        } 
+        }
 
         long timeInTransaction = txnEndTime - txnStartTime;
 
         transactionTimes.add(timeInTransaction);
 
-        totalNumTransactionsPerEpoch[epoch] += 1; 
+        totalNumTransactionsPerEpoch[epoch] += 1;
 
         transactionTimePerEpoch[epoch] += timeInTransaction;
 
@@ -99,33 +99,33 @@ public class TransactionInfo{
         totalNumTransactions += 1;
     }
 
-    public long getTotalTransactionTime(){
+    public long getTotalTransactionTime() {
         return totalTransactionTime;
     }
 
-    public long getTotalNumTransactions(){
-        return totalNumTransactions; 
+    public long getTotalNumTransactions() {
+        return totalNumTransactions;
     }
 
-    public long[] getNumTransactionsPerEpoch(){
+    public long[] getNumTransactionsPerEpoch() {
         return totalNumTransactionsPerEpoch;
     }
 
-    public long[] getTransactionTimePerEpoch(){
+    public long[] getTransactionTimePerEpoch() {
         return transactionTimePerEpoch;
     }
 
-    public int getNumEpochs(){
+    public int getNumEpochs() {
         return numEpochs;
     }
 
-    public void setTag(String tag){
-        this.tag = tag; 
+    public void setTag(String tag) {
+        this.tag = tag;
     }
 
 
-    // Let's do some math 
-    public void compute(){
+    // Let's do some math
+    public void compute() {
         Collections.sort(transactionTimes);
         isSorted = true;
 
@@ -133,69 +133,68 @@ public class TransactionInfo{
 
         int sizeTxnTimes = transactionTimes.size();
 
-        for(int i = 0; i < percentiles.length; i++){
+        for (int i = 0; i < percentiles.length; i++) {
 
             long timeSum = 0;
-            int numberOfTransactions = (int) (sizeTxnTimes * (1-percentiles[i]))+1;
+            int numberOfTransactions = (int) (sizeTxnTimes * (1 - percentiles[i])) + 1;
             int startingPosition = sizeTxnTimes - numberOfTransactions;
 
-            for (int j = startingPosition; j < sizeTxnTimes; j++){
+            for (int j = startingPosition; j < sizeTxnTimes; j++) {
                 timeSum += transactionTimes.get(j);
             }
 
             double avgTime = timeSum / numberOfTransactions;
 
-            avgTxnTimes[i] = avgTime; 
+            avgTxnTimes[i] = avgTime;
         }
     }
 
-    // Moves all the information from input into this object. 
-    public boolean combine(TransactionInfo input){
+    // Moves all the information from input into this object.
+    public boolean combine(TransactionInfo input) {
 
 
-        if(numEpochs != input.numEpochs){
+        if (numEpochs != input.numEpochs) {
             return false;
         }
-        
+
 
         totalNumTransactions += input.totalNumTransactions;
-        totalTransactionTime += input.totalTransactionTime; 
+        totalTransactionTime += input.totalTransactionTime;
 
-        for(int i = 0; i < numEpochs; i++){
-           totalNumTransactionsPerEpoch[i] += input.totalNumTransactionsPerEpoch[i];
-           transactionTimePerEpoch[i] += input.transactionTimePerEpoch[i]; 
+        for (int i = 0; i < numEpochs; i++) {
+            totalNumTransactionsPerEpoch[i] += input.totalNumTransactionsPerEpoch[i];
+            transactionTimePerEpoch[i] += input.transactionTimePerEpoch[i];
 
         }
 
         // Let's combine
 
-        if (!isSorted){
+        if (!isSorted) {
             Collections.sort(transactionTimes);
-        } 
+        }
 
-        if (!input.isSorted){
+        if (!input.isSorted) {
             Collections.sort(input.transactionTimes);
         }
 
         ArrayList<Long> newTransactionTime = new ArrayList<Long>();
 
-        while (transactionTimes.size()>0 || input.transactionTimes.size() > 0){
-            
-            if(transactionTimes.size() == 0){
+        while (transactionTimes.size() > 0 || input.transactionTimes.size() > 0) {
+
+            if (transactionTimes.size() == 0) {
                 newTransactionTime.add(input.transactionTimes.remove(0));
-                continue; 
+                continue;
             }
 
-            if(input.transactionTimes.size() == 0){
+            if (input.transactionTimes.size() == 0) {
                 newTransactionTime.add(transactionTimes.remove(0));
-                continue; 
+                continue;
             }
 
 
-            if(input.transactionTimes.get(0) < transactionTimes.get(0)){
+            if (input.transactionTimes.get(0) < transactionTimes.get(0)) {
                 newTransactionTime.add(input.transactionTimes.remove(0));
-            }
-            else{
+            } else {
                 newTransactionTime.add(transactionTimes.remove(0));
             }
         }
@@ -204,7 +203,7 @@ public class TransactionInfo{
         return true;
     }
 
-    public void toJsonFile(String path, String allTransactionsPath){
+    public void toJsonFile(String path, String allTransactionsPath) {
 
         compute();
 
@@ -221,7 +220,7 @@ public class TransactionInfo{
         JSONArray percentileArray = new JSONArray();
         JSONArray timeArray = new JSONArray();
 
-        for(int i = 0; i < avgTxnTimes.length; i++){
+        for (int i = 0; i < avgTxnTimes.length; i++) {
             percentileArray.add(percentiles[i]);
             timeArray.add(avgTxnTimes[i]);
         }
@@ -236,7 +235,7 @@ public class TransactionInfo{
         JSONArray txnPerEpoch = new JSONArray();
         JSONArray txnTimePerEpoch = new JSONArray();
 
-        for(int i = 0; i < numEpochs; i++){
+        for (int i = 0; i < numEpochs; i++) {
             txnPerEpoch.add(totalNumTransactionsPerEpoch[i]);
             txnTimePerEpoch.add(transactionTimePerEpoch[i]);
         }
@@ -247,11 +246,10 @@ public class TransactionInfo{
         Path p = Paths.get(path);
         byte[] data = rootObj.toJSONString().getBytes();
 
-        // Write out the data 
-        try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(p))){
+        // Write out the data
+        try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(p))) {
             out.write(data, 0, data.length);
-        }
-        catch (IOException x) {
+        } catch (IOException x) {
             System.err.println(x);
         }
 
@@ -261,7 +259,7 @@ public class TransactionInfo{
 
         JSONArray txnTimes = new JSONArray();
 
-        for(int i = 0; i< transactionTimes.size(); i++){
+        for (int i = 0; i < transactionTimes.size(); i++) {
             txnTimes.add(transactionTimes.get(i));
         }
 
@@ -270,16 +268,15 @@ public class TransactionInfo{
         Path outputPath = Paths.get(allTransactionsPath);
         byte[] outputData = obj.toJSONString().getBytes();
 
-        try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(outputPath))){
+        try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(outputPath))) {
             out.write(outputData, 0, outputData.length);
-        }
-        catch (IOException x) {
+        } catch (IOException x) {
             System.err.println(x);
         }
 
     }
 
-    public boolean readFromJsonFile(String path, String allTransactionsPath){
+    public boolean readFromJsonFile(String path, String allTransactionsPath) {
         JSONParser parser = new JSONParser();
 
         try (Reader reader = new FileReader(path)) {
@@ -287,35 +284,34 @@ public class TransactionInfo{
             JSONObject jsonObject = (JSONObject) parser.parse(reader);
 
 
-            // Deal with the arrays 
+            // Deal with the arrays
             JSONArray txnPerEpoch = (JSONArray) jsonObject.get("totalNumTransactionsPerEpoch");
 
             JSONArray txnTimePerEpoch = (JSONArray) jsonObject.get("transactionTimePerEpoch");
 
-            totalNumTransactionsPerEpoch = copyToArray(txnPerEpoch);  
-             
-            transactionTimePerEpoch = copyToArray(txnTimePerEpoch);  
+            totalNumTransactionsPerEpoch = copyToArray(txnPerEpoch);
 
-            // Read in the numbers 
-           
-            try{
-                JSONObject percentileObj = (JSONObject) jsonObject.get("percentileInfo"); 
+            transactionTimePerEpoch = copyToArray(txnTimePerEpoch);
+
+            // Read in the numbers
+
+            try {
+                JSONObject percentileObj = (JSONObject) jsonObject.get("percentileInfo");
 
                 JSONArray percentileArray = (JSONArray) percentileObj.get("percentiles");
                 JSONArray timeArray = (JSONArray) percentileObj.get("avgTxnTimes");
 
-                for(int i = 0; i < percentileArray.size(); i++){
+                for (int i = 0; i < percentileArray.size(); i++) {
                     percentiles[i] = (Double) percentileArray.get(i);
                     avgTxnTimes[i] = (Double) timeArray.get(i);
                 }
-            }
-            catch(Exception e){
+            } catch (Exception e) {
                 System.err.println("ERROR: TransactionInfo: Error reading in percentile info");
                 System.err.println(e.toString());
             }
 
 
-            if (jsonObject.get("tag") != null){
+            if (jsonObject.get("tag") != null) {
                 tag = (String) jsonObject.get("tag");
             }
 
@@ -333,7 +329,7 @@ public class TransactionInfo{
 
             transactionTimes.clear();
 
-            for(int i = 0; i< allTransactions.size(); i++){
+            for (int i = 0; i < allTransactions.size(); i++) {
                 transactionTimes.add((Long) allTransactions.get(i));
             }
 
@@ -350,11 +346,11 @@ public class TransactionInfo{
 
 
         return true;
-    } 
+    }
 
-    private static long[] copyToArray(JSONArray arr){
+    private static long[] copyToArray(JSONArray arr) {
         long[] outputArr = new long[arr.size()];
-        for(int i = 0; i<arr.size(); i++){
+        for (int i = 0; i < arr.size(); i++) {
             outputArr[i] = (long) arr.get(i);
         }
 
@@ -362,7 +358,7 @@ public class TransactionInfo{
     }
 
 
-    public String toString(){
+    public String toString() {
 
         String outputStr = "";
         outputStr += "Total Transactions: " + totalNumTransactions  + "\n";
@@ -371,16 +367,16 @@ public class TransactionInfo{
         outputStr += "Total transactions per epoch: " + arrToString(totalNumTransactionsPerEpoch) + "\n";
         outputStr += "Number of epochs: " + numEpochs + "\n";
 
-        return outputStr; 
+        return outputStr;
     }
 
-    public static String arrToString(long[] arr){
-        if (arr.length == 0){
+    public static String arrToString(long[] arr) {
+        if (arr.length == 0) {
             return "[]";
         }
-        String outputStr = "[" + arr[0]; 
-        
-        for(int i = 1; i< arr.length; i++){
+        String outputStr = "[" + arr[0];
+
+        for (int i = 1; i < arr.length; i++) {
             outputStr += ", " + arr[i];
 
         }

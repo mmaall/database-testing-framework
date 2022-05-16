@@ -9,30 +9,30 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 
-public class DatabaseThread extends Thread{
-    // Name of the thread  
+public class DatabaseThread extends Thread {
+    // Name of the thread
     private String threadName;
     private int count;
     private String dbUrl;
     private Connection conn;
-    private final String dbName = "rocks_db_test_db"; 
-    // Holds how long the thread will run queries for in milliseconds  
-    private long threadRuntime;  
+    private final String dbName = "rocks_db_test_db";
+    // Holds how long the thread will run queries for in milliseconds
+    private long threadRuntime;
 
     private byte threadID;
     private byte systemID;
 
-    private RecordInfo recordInfo; 
+    private RecordInfo recordInfo;
 
-    private int numEpochs;  
+    private int numEpochs;
 
     private TransactionInfo txnInfo;
 
 
     /**
-     * Customer prepared statements 
+     * Customer prepared statements
     **/
-    private PreparedStatement findCustomerByUID; 
+    private PreparedStatement findCustomerByUID;
 
     private PreparedStatement findCustomerByAge;
 
@@ -48,17 +48,17 @@ public class DatabaseThread extends Thread{
 
     private PreparedStatement findProductAfterDate;
 
-    private PreparedStatement findProductBetweenDate; 
+    private PreparedStatement findProductBetweenDate;
 
     private PreparedStatement findProductByInventoryRange;
 
-    private PreparedStatement updateProductByID; 
+    private PreparedStatement updateProductByID;
 
     /**
-     * Order prepared statements 
+     * Order prepared statements
     **/
 
-    private PreparedStatement findOrderByUID; 
+    private PreparedStatement findOrderByUID;
 
     private PreparedStatement findOrderByCustomer;
 
@@ -73,9 +73,9 @@ public class DatabaseThread extends Thread{
     private PreparedStatement insertOrder;
 
 
-    //Constructor 
+    //Constructor
 
-    // Thread runtime is in milliseconds 
+    // Thread runtime is in milliseconds
     public DatabaseThread(String name, String databaseUrl, RecordInfo recordInfo, byte systemID, byte threadID, long threadRuntime) {
 
         System.out.println("Creating " +  name);
@@ -83,20 +83,19 @@ public class DatabaseThread extends Thread{
         dbUrl = databaseUrl;
         this.threadID = threadID;
         this.systemID = systemID;
-        this.recordInfo = recordInfo; 
-        this.threadRuntime = threadRuntime; 
+        this.recordInfo = recordInfo;
+        this.threadRuntime = threadRuntime;
 
         numEpochs = (int) (threadRuntime / 1000 / 60);
 
         // Set up connection
-        try{
-            System.out.println("Attempting connection to "+databaseUrl);
+        try {
+            System.out.println("Attempting connection to " + databaseUrl);
             conn = DriverManager.getConnection(dbUrl);
-            // Turning off autocommit 
+            // Turning off autocommit
             conn.setAutoCommit(false);
             System.out.println("DB Connection Acquired");
-        }
-        catch(SQLException e){
+        } catch (SQLException e) {
             System.err.println("ERROR: DatabaseThread: Unable to connect to " + dbUrl);
             System.err.println(e.toString());
             System.exit(-1);
@@ -105,12 +104,12 @@ public class DatabaseThread extends Thread{
         // Prepare Statements
 
         /**
-         * Customer prepared statements 
+         * Customer prepared statements
         **/
 
-        // Find a customer by their given UID 
+        // Find a customer by their given UID
         String findCustomerByUID_str = "SELECT * FROM customers WHERE customer_id = ?";
-        // Find a customer by their age      
+        // Find a customer by their age
         String findCustomerByAge_str = "SELECT * FROM customers WHERE age >= ? AND age <= ?";
 
         /**
@@ -125,17 +124,17 @@ public class DatabaseThread extends Thread{
 
         String findProductAfterDate_str;
 
-        String findProductBetweenDate_str = "SELECT * FROM products WHERE posting_date >= ? AND posting_date <= ?";  
+        String findProductBetweenDate_str = "SELECT * FROM products WHERE posting_date >= ? AND posting_date <= ?";
 
-        String findProductByInventoryRange_str = "SELECT * FROM products WHERE quantity >= ? AND quantity <= ?"; 
+        String findProductByInventoryRange_str = "SELECT * FROM products WHERE quantity >= ? AND quantity <= ?";
 
         String updateProductByID_str = "UPDATE products SET quantity = quantity + ? WHERE product_id = ?";
 
         /**
-         * Order prepared statements 
+         * Order prepared statements
         **/
 
-        String findOrderByUID_str = "SELECT * FROM orders WHERE order_id = ?"; 
+        String findOrderByUID_str = "SELECT * FROM orders WHERE order_id = ?";
 
         String findOrderByCustomer_str = "SELECT * FROM orders WHERE customer_id = ?";
 
@@ -150,9 +149,9 @@ public class DatabaseThread extends Thread{
         String insertOrder_str = "INSERT INTO orders (order_id, customer_id, product_id, quantity) VALUES (?, ?, ?, ?)";
 
 
-        try{
+        try {
 
-            // Customers            
+            // Customers
             findCustomerByUID = conn.prepareStatement(findCustomerByUID_str);
             findCustomerByAge = conn.prepareStatement(findCustomerByAge_str);
 
@@ -161,12 +160,12 @@ public class DatabaseThread extends Thread{
             findProductByPriceRange = conn.prepareStatement(findProductByPriceRange_str);
             findProductBeforeDate = conn.prepareStatement(findProductBeforeDate_str);
             // findProductAfterDate = conn.prepareStatement(findProductAfterDate_str);
-            findProductBetweenDate = conn.prepareStatement(findProductBetweenDate_str); 
+            findProductBetweenDate = conn.prepareStatement(findProductBetweenDate_str);
             findProductByInventoryRange = conn.prepareStatement(findProductByInventoryRange_str);
-            updateProductByID = conn.prepareStatement(updateProductByID_str); 
+            updateProductByID = conn.prepareStatement(updateProductByID_str);
 
             // Orders
-            findOrderByUID = conn.prepareStatement(findOrderByUID_str); 
+            findOrderByUID = conn.prepareStatement(findOrderByUID_str);
             findOrderByCustomer = conn.prepareStatement(findOrderByCustomer_str);
             findOrderByProduct = conn.prepareStatement(findOrderByProduct_str);
             findOrderBeforeDate = conn.prepareStatement(findOrderBeforeDate_str);
@@ -174,15 +173,14 @@ public class DatabaseThread extends Thread{
             // findOrderBetweenDate = conn.prepareStatement(findOrderBeforeDate_str);
             insertOrder = conn.prepareStatement(insertOrder_str);
             System.out.println("All statements prepared");
-        }
-        catch(Exception e){
-            System.err.println("ERROR: DatabaseThread: Unable to set up "+
-                                "prepared statements");
+        } catch (Exception e) {
+            System.err.println("ERROR: DatabaseThread: Unable to set up " +
+                               "prepared statements");
             System.err.println(e.toString());
         }
     }
 
-     
+
     public void run() {
         System.out.println("Running " + threadName);
 
@@ -191,7 +189,7 @@ public class DatabaseThread extends Thread{
         //System.exit(-1);
 
 
-        // UID information holders, holds uids and is a queue. We will be making requests from the queue. 
+        // UID information holders, holds uids and is a queue. We will be making requests from the queue.
 
         int bufferSize = 250;
 
@@ -204,10 +202,9 @@ public class DatabaseThread extends Thread{
         // UniqueID Generator
 
         UniqueIDGenerator uidGenerator = null;
-        try{
+        try {
             uidGenerator = new UniqueIDGenerator(systemID, threadID);
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             System.err.println(e.toString());
             return;
         }
@@ -217,65 +214,65 @@ public class DatabaseThread extends Thread{
         // Let's do some real stuff
         long threadStartTime = System.currentTimeMillis();
 
-        long threadEndTime = threadStartTime + threadRuntime; 
+        long threadEndTime = threadStartTime + threadRuntime;
 
         long totalTransactionTime = 0;
 
-        int numTransactions = 0; 
+        int numTransactions = 0;
 
         txnInfo = new TransactionInfo(System.currentTimeMillis(), numEpochs);
         System.out.println("Transactions starting");
-        // Run this thread for the predetirmined amount of time. 
-        while(System.currentTimeMillis() < threadEndTime){
+        // Run this thread for the predetirmined amount of time.
+        while (System.currentTimeMillis() < threadEndTime) {
             System.out.println("Executing transaction");
-            // Let's start executing queries 
+            // Let's start executing queries
 
-            // Generate a number between 1 and 100 
-            int randomInt = (int) (Math.random()*100); 
+            // Generate a number between 1 and 100
+            int randomInt = (int) (Math.random() * 100);
 
 
             // Get a customer's information, get orders for that customer
             // Uses the hot records provided on this machine
-            if(randomInt < 25){
+            if (randomInt < 25) {
                 System.out.println("Get customer info, order something");
-                int randomVal = (int) (Math.random()*2);
+                int randomVal = (int) (Math.random() * 2);
                 //System.out.println("Rand val: " + randomVal);
                 long uid;
 
-                // pull from the queue of ones we've quiered upon 
-                if (randomVal == 0 && customerQueue.size() > 0 ){
+                // pull from the queue of ones we've quiered upon
+                if (randomVal == 0 && customerQueue.size() > 0 ) {
                     //System.out.println("Random value");
-                    uid = customerQueue.remove(0); 
-                } 
+                    uid = customerQueue.remove(0);
+                }
                 // Get from the hot records
-                else{
+                else {
                     uid = recordInfo.getCustomerUID();
                 }
 
 
 
-                try{
+                try {
                     // Set up the prepared statements
                     findCustomerByUID.setLong(1, uid);
                     findOrderByCustomer.setLong(1, uid);
 
-                    long txnStartTime = System.currentTimeMillis(); 
+                    long txnStartTime = System.currentTimeMillis();
                     // Execute query
                     ResultSet rset = findCustomerByUID.executeQuery();
-                    if(rset.next()){
+                    if (rset.next()) {
                         //System.out.println("ID Found: " + rset.getLong(1));
                     }
 
                     rset = findOrderByCustomer.executeQuery();
 
                     // Add the orders to orders queue
-                    while(rset.next()){
+                    while (rset.next()) {
                         // enforce buffer size
-                        if(orderQueue.size() < bufferSize ){
+                        if (orderQueue.size() < bufferSize ) {
                             orderQueue.add(rset.getLong(1));
                         }
 
-                        if(productQueue.size()< bufferSize){
+                        if (productQueue.size() < bufferSize) {
                             //System.out.println("Add to product queue");
                             productQueue.add(rset.getLong(3));
                             //System.out.println("Product queue size:"+ productQueue.size());
@@ -286,12 +283,11 @@ public class DatabaseThread extends Thread{
                     conn.commit();
 
                     long txnEndTime = System.currentTimeMillis();
-                    txnInfo.addTransaction(txnStartTime, txnEndTime); 
+                    txnInfo.addTransaction(txnStartTime, txnEndTime);
                     long txnTime = txnEndTime - txnStartTime;
                     totalTransactionTime += txnTime;
                     numTransactions++;
-                }
-                catch(SQLException e){
+                } catch (SQLException e) {
                     System.err.println("ERROR: DatabaseThread: Sql exception during query.");
                     System.err.println(e.toString());
                 }
@@ -299,25 +295,25 @@ public class DatabaseThread extends Thread{
             }
 
             // Increase the inventory of an item
-            else if (randomInt >= 98){
+            else if (randomInt >= 98) {
                 System.out.println("Increase inventory");
 
-                int randomVal = (int) (Math.random()*2);
+                int randomVal = (int) (Math.random() * 2);
 
                 long uid;
 
-                // pull from the queue of ones we've quiered upon 
-                if (randomVal == 0 && productQueue.size() > 0 ){
+                // pull from the queue of ones we've quiered upon
+                if (randomVal == 0 && productQueue.size() > 0 ) {
                     //System.out.println("Selecting from product queue");
-                    uid = productQueue.remove(0); 
-                } 
+                    uid = productQueue.remove(0);
+                }
                 // Get from the hot records
-                else{
+                else {
                     uid = recordInfo.getProductUID();
                 }
 
 
-                try{
+                try {
                     int amountToAdd = (int) (Math.random() * 1000);
 
                     updateProductByID.setInt(1, amountToAdd);
@@ -327,13 +323,12 @@ public class DatabaseThread extends Thread{
                     int numUpdates = updateProductByID.executeUpdate();
                     conn.commit();
                     long txnEndTime = System.currentTimeMillis();
-                    txnInfo.addTransaction(txnStartTime, txnEndTime); 
+                    txnInfo.addTransaction(txnStartTime, txnEndTime);
                     long txnTime = txnEndTime - txnStartTime;
                     totalTransactionTime += txnTime;
                     numTransactions++;
 
-                }
-                catch(SQLException e){
+                } catch (SQLException e) {
                     System.err.println("ERROR: DatabaseThread: Sql exception during query.");
                     System.err.println(e.toString());
                 }
@@ -343,48 +338,47 @@ public class DatabaseThread extends Thread{
             // Get customer info
             // Get info about 10 products
             // Order one of those products
-            else if (25<= randomInt && randomInt < 75){
+            else if (25 <= randomInt && randomInt < 75) {
 
                 System.out.println("Customer info, ask about 10 products, order one");
-                int randomVal = (int) (Math.random()*2);
+                int randomVal = (int) (Math.random() * 2);
                 //System.out.println("Rand val: " + randomVal);
                 long customerUID;
 
-                // pull from the queue of ones we've quiered upon 
-                if (randomVal == 0 && customerQueue.size() > 0 ){
+                // pull from the queue of ones we've quiered upon
+                if (randomVal == 0 && customerQueue.size() > 0 ) {
                     //System.out.println("Random value");
-                    customerUID = customerQueue.remove(0); 
-                } 
+                    customerUID = customerQueue.remove(0);
+                }
                 // Get from the hot records
-                else{
+                else {
                     customerUID = recordInfo.getCustomerUID();
                 }
 
 
                 long[] productIds = new long[10];
-                for (int i = 0; i < productIds.length; i++){
+                for (int i = 0; i < productIds.length; i++) {
 
-                    randomVal = (int) (Math.random()*2);
+                    randomVal = (int) (Math.random() * 2);
 
-                    if (randomVal == 0 && productQueue.size() > 0){
+                    if (randomVal == 0 && productQueue.size() > 0) {
                         productIds[i] = productQueue.remove(0);
-                    }
-                    else{
+                    } else {
                         productIds[i] = recordInfo.getProductUID();
                     }
 
                 }
 
                 int amountToAdd = (int) (Math.random() * 100);
-                long productToAdd = 
-                        productIds[(int) (Math.random()*productIds.length)];
+                long productToAdd =
+                    productIds[(int) (Math.random() * productIds.length)];
                 // Generate the UID for the order
 
 
                 long orderUID = uidGenerator.getUID();
 
                 // Prepare the queries we can
-                try{
+                try {
                     findCustomerByUID.setLong(1, customerUID);
 
                     updateProductByID.setInt(1, -1 * amountToAdd);
@@ -397,10 +391,10 @@ public class DatabaseThread extends Thread{
 
                     // Start executing
                     long txnStartTime = System.currentTimeMillis();
-                    // Get the customer info 
+                    // Get the customer info
                     ResultSet rset = findCustomerByUID.executeQuery();
                     // Get the info about all those good products
-                    for(int i = 0; i< productIds.length; i++){
+                    for (int i = 0; i < productIds.length; i++) {
                         findProductByUID.setLong(1, productIds[i]);
                         rset = findProductByUID.executeQuery();
                     }
@@ -408,20 +402,19 @@ public class DatabaseThread extends Thread{
                     // Update the product to remove the quantity to order
                     updateProductByID.executeUpdate();
 
-                    // Insert the order 
+                    // Insert the order
                     insertOrder.executeUpdate();
 
 
                     conn.commit();
-                    
+
                     long txnEndTime = System.currentTimeMillis();
-                    txnInfo.addTransaction(txnStartTime, txnEndTime); 
+                    txnInfo.addTransaction(txnStartTime, txnEndTime);
                     long txnTime = txnEndTime - txnStartTime;
                     totalTransactionTime += txnTime;
                     numTransactions++;
 
-                }
-                catch(SQLException e){
+                } catch (SQLException e) {
                     System.err.println("ERROR: DatabaseThread: Sql exception during query.");
                     System.err.println(e.toString());
                 }
@@ -430,7 +423,7 @@ public class DatabaseThread extends Thread{
             }
 
             /*
-            // Get the products in a date range 
+            // Get the products in a date range
             else if(75<= randomInt && randomInt < 98){
                 System.out.println("Product id by date range");
                 String date1 = createRandomDate(2000, 2010).toString();
@@ -443,18 +436,18 @@ public class DatabaseThread extends Thread{
 
                     // Start executing
                     long txnStartTime = System.currentTimeMillis();
-                    // Get the customer info 
+                    // Get the customer info
                     ResultSet rset = findProductBetweenDate.executeQuery();
-                   
+
                     while(rset.next()){
                         if (productQueue.size() < bufferSize){
-                            productQueue.add(rset.getLong(1));    
+                            productQueue.add(rset.getLong(1));
                         }
                     }
                     conn.commit();
-                    
+
                     long txnEndTime = System.currentTimeMillis();
-                    txnInfo.addTransaction(txnStartTime, txnEndTime); 
+                    txnInfo.addTransaction(txnStartTime, txnEndTime);
                     long txnTime = txnEndTime - txnStartTime;
                     totalTransactionTime += txnTime;
                     numTransactions++;
@@ -479,7 +472,7 @@ public class DatabaseThread extends Thread{
         //System.out.println("Total time in transactions: "+ totalTransactionTime);
 
         double avgTxnTime = totalTransactionTime / numTransactions;
-        
+
         /*
         System.out.println("Average Transaction Time: "+ avgTxnTime);
         System.out.println("Transactional info from object");
@@ -489,19 +482,19 @@ public class DatabaseThread extends Thread{
     }
 
 
-    public TransactionInfo getTransactionInfo(){
+    public TransactionInfo getTransactionInfo() {
         return txnInfo;
     }
 
-    public int getCount(){
+    public int getCount() {
         return count;
     }
 
-        /**
-     * Borrowed this from the internet
-     * Wasn't in the mood to write it myself. Thanks internet, you do great. 
-     * src: https://www.logicbig.com/how-to/code-snippets/jcode-java-random-random-dates.html
-     *
+    /**
+    * Borrowed this from the internet
+    * Wasn't in the mood to write it myself. Thanks internet, you do great.
+    * src: https://www.logicbig.com/how-to/code-snippets/jcode-java-random-random-dates.html
+    *
     **/
 
     public static int createRandomIntBetween(int start, int end) {
@@ -514,4 +507,4 @@ public class DatabaseThread extends Thread{
         int year = createRandomIntBetween(startYear, endYear);
         return LocalDate.of(year, month, day);
     }
-} 
+}

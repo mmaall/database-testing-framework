@@ -13,7 +13,7 @@ public class ServerState {
 
     private static ServerState state = new ServerState();
 
-    public Status status; 
+    public Status status;
 
     private ServerState() {
         status = Status.IDLE;

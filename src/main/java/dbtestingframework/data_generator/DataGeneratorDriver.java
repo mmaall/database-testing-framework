@@ -15,7 +15,7 @@ import data_generator.InvalidValueException;
 import data_generator.StringGenerator;
 import data_generator.UniqueIDGenerator;
 
-class DataGeneratorDriver{
+class DataGeneratorDriver {
 
 
     public static final int BIGINT = 0;
@@ -26,51 +26,51 @@ class DataGeneratorDriver{
     public static final int TIMESTAMP = 5;
 
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
 
         System.out.println("Hello, container!");
 
         // Holds the number of rows in each test
         //int[] rowsPerTest = {100,10600000, 18000000, 35000000};
         int[] rowsPerTest = {100, 100, 100, 100};
-        // Holds all the headers of the files  
-        String[] fileHeaders = {"mini","small" , "medium", "large"};
+        // Holds all the headers of the files
+        String[] fileHeaders = {"mini", "small" , "medium", "large"};
 
         String[] tableInfo = {"Customers", "Products", "Orders"};
 
         Object[][] customerInfo = {
-                                    {"customer_id", BIGINT}, 
-                                    {"name", VARCHAR, 50},
-                                    {"address", VARCHAR, 125},
-                                    {"age", INT, 100}
-                                  };
+            {"customer_id", BIGINT},
+            {"name", VARCHAR, 50},
+            {"address", VARCHAR, 125},
+            {"age", INT, 100}
+        };
 
         Object[][] productInfo = {
-                                    {"product_id", BIGINT}, 
-                                    {"name", VARCHAR, 50},
-                                    {"category", VARCHAR, 125},
-                                    {"price", DECIMAL, 4, 2},
-                                    {"description", VARCHAR, 1000},
-                                    {"quantity", INT, 500000},
-                                    {"posting_date", DATE}
-                                  };
+            {"product_id", BIGINT},
+            {"name", VARCHAR, 50},
+            {"category", VARCHAR, 125},
+            {"price", DECIMAL, 4, 2},
+            {"description", VARCHAR, 1000},
+            {"quantity", INT, 500000},
+            {"posting_date", DATE}
+        };
 
         Object[][] orderInfo = {
-                                    {"order_id", BIGINT}, 
-                                    {"customer_id", BIGINT},
-                                    {"product_id", BIGINT},
-                                    {"quantity", INT, 100},
-                                    {"purchase_time", TIMESTAMP}
-                                  };
+            {"order_id", BIGINT},
+            {"customer_id", BIGINT},
+            {"product_id", BIGINT},
+            {"quantity", INT, 100},
+            {"purchase_time", TIMESTAMP}
+        };
 
         Object[][] test = {
-                                    {"order_id", BIGINT}, 
-                                    {"customer_id", BIGINT},
-                                    {"product_id", BIGINT},
-                                    {"quantity", INT, 10000},
-                                    {"purchase_time", TIMESTAMP},
-                                    {"testThing", DATE}
-                                };
+            {"order_id", BIGINT},
+            {"customer_id", BIGINT},
+            {"product_id", BIGINT},
+            {"quantity", INT, 10000},
+            {"purchase_time", TIMESTAMP},
+            {"testThing", DATE}
+        };
 
 
         JSONObject outputObject = new JSONObject();
@@ -82,19 +82,19 @@ class DataGeneratorDriver{
 
         JSONArray selectedOrders = new JSONArray();
 
-        for(int i = 0; i< 3; i++){
+        for (int i = 0; i < 3; i++) {
             String fileType = fileHeaders[i];
             int numRows = rowsPerTest[i];
 
             System.out.println("**** Generating a total of " + numRows + " rows");
 
-            ArrayList<Long> customerUIDs = generateFile(fileType+"Customers.csv", (int) (numRows*.40), customerInfo, null, null, selectedCustomers);
+            ArrayList<Long> customerUIDs = generateFile(fileType + "Customers.csv", (int) (numRows * .40), customerInfo, null, null, selectedCustomers);
             System.out.println("Customers generated");
-            ArrayList<Long> productUIDs = generateFile(fileType+"Products.csv", (int)  (numRows*.20), productInfo, null, null, selectedProducts);
+            ArrayList<Long> productUIDs = generateFile(fileType + "Products.csv", (int)  (numRows * .20), productInfo, null, null, selectedProducts);
             System.out.println("Products generated");
-            generateFile(fileType+"Orders.csv", (int) (numRows*.40), orderInfo, customerUIDs, productUIDs, selectedOrders); 
+            generateFile(fileType + "Orders.csv", (int) (numRows * .40), orderInfo, customerUIDs, productUIDs, selectedOrders);
             System.out.println("Orders generated");
-            
+
 
 
             outputObject.put("customers", selectedCustomers);
@@ -103,14 +103,13 @@ class DataGeneratorDriver{
             outputObject.put("products", selectedProducts);
             outputObject.put("orders", selectedOrders);
 
-            Path p = Paths.get("./"+fileType+"SelectedIDs.json");
+            Path p = Paths.get("./" + fileType + "SelectedIDs.json");
             byte[] data = outputObject.toJSONString().getBytes();
 
-            // Write out the data 
-            try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(p))){
+            // Write out the data
+            try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(p))) {
                 out.write(data, 0, data.length);
-            }
-            catch (IOException x) {
+            } catch (IOException x) {
                 System.err.println(x);
             }
         }
@@ -126,15 +125,15 @@ class DataGeneratorDriver{
 
 
     // Assumes the first value will be the primary key.
-    // Will return all the primary keys, helpful for constructing tables 
-    // dependent on it   
-    public static ArrayList<Long> generateFile(String fileName, int numberOfRows, 
-                                      Object[][] tableInfo, 
-                                      ArrayList<Long> uidSet1, ArrayList<Long> uidSet2,
-                                      JSONArray selectedUIDs){
+    // Will return all the primary keys, helpful for constructing tables
+    // dependent on it
+    public static ArrayList<Long> generateFile(String fileName, int numberOfRows,
+            Object[][] tableInfo,
+            ArrayList<Long> uidSet1, ArrayList<Long> uidSet2,
+            JSONArray selectedUIDs) {
         System.out.println("Generating " + fileName);
         System.out.println("Rows: " + numberOfRows);
-        // Number of records that are going to be written out together 
+        // Number of records that are going to be written out together
         int batchSize = 500;
         // Number of attributes in a record
         int numAttributes = tableInfo.length;
@@ -142,93 +141,91 @@ class DataGeneratorDriver{
         ArrayList<Long> uniqueIDs = new ArrayList<Long>();
 
         int uidsCollected = 0;
-        int uidsToCollect = (int) (numberOfRows * .05); 
+        int uidsToCollect = (int) (numberOfRows * .05);
 
         // Write the file header
 
-        // Csv header holds the first line of the csv file 
+        // Csv header holds the first line of the csv file
         String csvHeader = (String) tableInfo[0][0];
 
-        for(int i = 1; i< tableInfo.length; i++){
-            csvHeader+= ", "+ tableInfo[i][0];
+        for (int i = 1; i < tableInfo.length; i++) {
+            csvHeader += ", " + tableInfo[i][0];
         }
 
-        csvHeader +="\n";
+        csvHeader += "\n";
 
         byte data[] = csvHeader.getBytes();
-        Path p = Paths.get("./"+fileName);
+        Path p = Paths.get("./" + fileName);
 
 
-        // Write out the data 
-        try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(p))){
+        // Write out the data
+        try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(p))) {
             out.write(data, 0, data.length);
-        
-
-            int totalRecordsGenerated= 0; 
-
-            // Start looping through, write in batches 
 
 
-            while(true){
+            int totalRecordsGenerated = 0;
+
+            // Start looping through, write in batches
+
+
+            while (true) {
                 //Creates an array to hold all the data we will generate
                 String generatedData[][] = new String[numAttributes][batchSize];
 
                 String outputString = "";
 
-                for(int i = 0; i< numAttributes; i++){
+                for (int i = 0; i < numAttributes; i++) {
                     // get the type of the table
                     int type = (int) tableInfo[i][1];
 
-                    for(int j = 0; j < batchSize; j++){
+                    for (int j = 0; j < batchSize; j++) {
 
-                        String outputStr="";
+                        String outputStr = "";
 
-                        if (type == BIGINT){
-                            // Going to generate using unique ids 
-                            if (i == 0){
-                            
+                        if (type == BIGINT) {
+                            // Going to generate using unique ids
+                            if (i == 0) {
+
                                 UniqueIDGenerator generator;
 
-                                try{
-                                    UniqueIDGenerator tempGenerator = 
-                                                            new UniqueIDGenerator();
+                                try {
+                                    UniqueIDGenerator tempGenerator =
+                                        new UniqueIDGenerator();
                                     generator = tempGenerator;
-                                }
-                                catch(Exception e){
+                                } catch (Exception e) {
                                     System.out.println(e.toString());
                                     return null;
                                 }
                                 long key = generator.getUID();
 
-                                if(uniqueIDs.size() < numberOfRows){
+                                if (uniqueIDs.size() < numberOfRows) {
                                     uniqueIDs.add(key);
                                 }
 
                                 outputStr += key;
 
-                                if (uidsCollected < uidsToCollect){
+                                if (uidsCollected < uidsToCollect) {
                                     selectedUIDs.add(key);
                                     uidsCollected++;
                                 }
 
                             }
-                            // Otherwise we will pick a key using a gausien distribution 
-                            else{
+                            // Otherwise we will pick a key using a gausien distribution
+                            else {
                                 ArrayList<Long> ids;
-                                if (i == 1){
+                                if (i == 1) {
                                     ids = uidSet1;
-                                }
-                                else{
+                                } else {
                                     ids = uidSet2;
                                 }
                                 Random rand = new Random();
-                                int stdDev = ids.size()/4;
-                                int mean = ids.size()/2;
+                                int stdDev = ids.size() / 4;
+                                int mean = ids.size() / 2;
 
-                                int keyToPick = (int) (rand.nextGaussian()*stdDev + mean );
+                                int keyToPick = (int) (rand.nextGaussian() * stdDev + mean );
 
-                                if (keyToPick < 0 || keyToPick >= ids.size()){
-                                    keyToPick = (int)  (Math.random()*ids.size()); 
+                                if (keyToPick < 0 || keyToPick >= ids.size()) {
+                                    keyToPick = (int)  (Math.random() * ids.size());
                                 }
 
                                 //System.out.println(keyToPick);
@@ -239,57 +236,53 @@ class DataGeneratorDriver{
                             }
                         }
 
-                        else if (type == INT){
+                        else if (type == INT) {
                             int maxValue = (int) tableInfo[i][2];
-                            int randomValue = (int) (Math.random()*maxValue);
-                            outputStr += randomValue; 
-                        }
-                        else if (type == VARCHAR){
+                            int randomValue = (int) (Math.random() * maxValue);
+                            outputStr += randomValue;
+                        } else if (type == VARCHAR) {
                             outputStr += "\"";
                             int numCharacters = (int) tableInfo[i][2];
 
-                            //Varachars have a variance of 30 characters. 
+                            //Varachars have a variance of 30 characters.
                             outputStr += StringGenerator.generateAlphaNumeric(numCharacters, 30);
-                            outputStr += "\""; 
-                        }
-                        else if (type == DECIMAL){
+                            outputStr += "\"";
+                        } else if (type == DECIMAL) {
                             int leftOfDecimal = (int) tableInfo[i][2];
                             int rightOfDecimal = (int) tableInfo[i][3];
 
-                            outputStr += StringGenerator.generateDecimal(leftOfDecimal, rightOfDecimal); 
-                        }
-                        else if (type == DATE){
-                            outputStr += createRandomDate(2010,2018).toString();
+                            outputStr += StringGenerator.generateDecimal(leftOfDecimal, rightOfDecimal);
+                        } else if (type == DATE) {
+                            outputStr += createRandomDate(2010, 2018).toString();
 
 
-                        }
-                        else if (type == TIMESTAMP){
+                        } else if (type == TIMESTAMP) {
                             outputStr += createRandomDate(2010, 2019).toString();
 
                             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
                             String timeStr = timestamp.toString();
 
-                            for(int n = 0; n<timeStr.length(); n++){
-                                if(timeStr.charAt(n)== ' '){
-                                    timeStr = timeStr.substring(n+1);
+                            for (int n = 0; n < timeStr.length(); n++) {
+                                if (timeStr.charAt(n) == ' ') {
+                                    timeStr = timeStr.substring(n + 1);
                                     break;
                                 }
                             }
-                            outputStr += " " +timeStr;
+                            outputStr += " " + timeStr;
                         }
-                        generatedData[i][j]= outputStr;
+                        generatedData[i][j] = outputStr;
 
                     }
 
                 }
 
                 //generate the strings
-                for(int i = 0; i< batchSize; i++){
-                    if (totalRecordsGenerated ==numberOfRows){
+                for (int i = 0; i < batchSize; i++) {
+                    if (totalRecordsGenerated == numberOfRows) {
                         break;
                     }
                     outputString += generatedData[0][i];
-                    for(int j = 1; j < numAttributes; j++){
+                    for (int j = 1; j < numAttributes; j++) {
 
                         outputString += ", " + generatedData[j][i];
                     }
@@ -304,16 +297,15 @@ class DataGeneratorDriver{
 
                 out.write(outputBytes, 0, outputBytes.length);
 
-                if (totalRecordsGenerated % 100000 == 0){
-                    System.out.println("Total Records Generated: "+totalRecordsGenerated);
+                if (totalRecordsGenerated % 100000 == 0) {
+                    System.out.println("Total Records Generated: " + totalRecordsGenerated);
                 }
-                if(totalRecordsGenerated == numberOfRows){
+                if (totalRecordsGenerated == numberOfRows) {
                     out.close();
                     break;
                 }
             }
-        } 
-        catch (IOException x) {
+        } catch (IOException x) {
             System.err.println(x);
         }
 
@@ -324,7 +316,7 @@ class DataGeneratorDriver{
 
     /**
      * Borrowed this from the internet
-     * Wasn't in the mood to write it myself. Thanks internet, you do great. 
+     * Wasn't in the mood to write it myself. Thanks internet, you do great.
      * src: https://www.logicbig.com/how-to/code-snippets/jcode-java-random-random-dates.html
      *
     **/

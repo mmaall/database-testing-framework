@@ -1,16 +1,16 @@
 
-package ordersapp.dbclients; 
+package ordersapp.dbclients;
 
-// Exception to handle when invalid values are supplied 
+// Exception to handle when invalid values are supplied
 public class DatabaseClientException extends Exception {
-    private String details; 
+    private String details;
 
 
-    public DatabaseClientException(String details){
+    public DatabaseClientException(String details) {
         this.details = details;
     }
 
-    public String getDetails(){
+    public String getDetails() {
         return this.details;
     }
 }

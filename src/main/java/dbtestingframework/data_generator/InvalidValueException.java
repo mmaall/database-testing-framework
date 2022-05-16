@@ -1,15 +1,15 @@
 
-package data_generator; 
+package data_generator;
 
-// Exception to handle when invalid values are supplied 
+// Exception to handle when invalid values are supplied
 public class InvalidValueException extends Exception {
-    private String details; 
+    private String details;
 
-    public InvalidValueException(String details){
+    public InvalidValueException(String details) {
         this.details = details;
     }
 
-    public String getDetails(){
+    public String getDetails() {
         return this.details;
     }
 }

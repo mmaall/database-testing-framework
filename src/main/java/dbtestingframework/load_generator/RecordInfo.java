@@ -12,22 +12,22 @@ import java.io.Reader;
 import java.util.Iterator;
 import java.util.Arrays;
 
-public class RecordInfo{
+public class RecordInfo {
 
-    private String filePath; 
+    private String filePath;
 
     private long[] customerUIDs;
 
     private long[] productUIDs;
 
-    private long[] orderUIDs; 
+    private long[] orderUIDs;
 
 
-    public RecordInfo(){
+    public RecordInfo() {
 
     }
 
-    public RecordInfo(String path){
+    public RecordInfo(String path) {
         filePath = path;
 
         // Let's try and read in the json
@@ -37,33 +37,33 @@ public class RecordInfo{
     }
 
 
-    public long getCustomerUID(){
+    public long getCustomerUID() {
 
         int chosenOne = (int) (Math.random() * customerUIDs.length);
-        return customerUIDs[chosenOne]; 
+        return customerUIDs[chosenOne];
     }
 
-    public long getProductUID(){
+    public long getProductUID() {
         int chosenOne = (int) (Math.random() * productUIDs.length);
-        return productUIDs[chosenOne]; 
+        return productUIDs[chosenOne];
     }
 
-    public long getOrderUID(){
+    public long getOrderUID() {
         int chosenOne = (int) (Math.random() * orderUIDs.length);
-        return orderUIDs[chosenOne]; 
+        return orderUIDs[chosenOne];
     }
 
 
-    static long[] copyToArray(JSONArray arr){
+    static long[] copyToArray(JSONArray arr) {
         long[] outputArr = new long[arr.size()];
-        for(int i = 0; i<arr.size(); i++){
+        for (int i = 0; i < arr.size(); i++) {
             outputArr[i] = (long) arr.get(i);
         }
 
         return outputArr;
     }
 
-    public boolean readFromFile(){
+    public boolean readFromFile() {
 
 
         JSONParser parser = new JSONParser();
@@ -79,11 +79,11 @@ public class RecordInfo{
             JSONArray orderObj = (JSONArray) jsonObject.get("orders");
 
 
-            customerUIDs = copyToArray(customerObj);  
-             
-            productUIDs = copyToArray(productObj);  
-            
-            orderUIDs = copyToArray(orderObj);  
+            customerUIDs = copyToArray(customerObj);
+
+            productUIDs = copyToArray(productObj);
+
+            orderUIDs = copyToArray(orderObj);
 
 
         } catch (IOException e) {

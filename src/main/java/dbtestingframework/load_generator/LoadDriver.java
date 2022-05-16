@@ -7,27 +7,27 @@ import load_generator.RecordInfo;
 import load_generator.TransactionInfo;
 
 
-public class LoadDriver{
+public class LoadDriver {
 
-    public static void main(String args[]){
-        
+    public static void main(String args[]) {
+
 
         // Argument information
 
-        // [db_url, username, password, testType, machineID, testLength, numThreads] 
+        // [db_url, username, password, testType, machineID, testLength, numThreads]
         // Test length is in minutes
 
         // Database info
 
 
-        String databaseUrl = "jdbc:mysql://"+args[0];
+        String databaseUrl = "jdbc:mysql://" + args[0];
         String userName = args[1];
         String password = args[2];
         String testType = args[3];
         byte machineID = (byte) Integer.parseInt(args[4]);
         String infoFile = "./" + testType + "SelectedIDs.json";
         // minutes, seconds, milliseconds
-        long testLength = Integer.parseInt(args[5]) * 60 * 1000; 
+        long testLength = Integer.parseInt(args[5]) * 60 * 1000;
 
         int numThreads = Integer.parseInt(args[6]);
         /*
@@ -39,14 +39,14 @@ public class LoadDriver{
         String infoFile = "./miniSelectedIDs.json";
         // minutes, seconds, milliseconds
         long testLength = 60 * 60 * 1000;
-        int numThreads = 4; 
+        int numThreads = 4;
         byte machineID = (byte) 0;
-        */ 
+        */
 
-        String fullUrl = databaseUrl+"?user="+userName+"&password="+password;
+        String fullUrl = databaseUrl + "?user=" + userName + "&password=" + password;
 
 
-        // Setup database client 
+        // Setup database client
         MySQLClient dbClient = new MySQLClient("test", "test", "test", "test");
 
 
@@ -55,12 +55,12 @@ public class LoadDriver{
 
         ArrayList<DatabaseThread> threadArray = new ArrayList<DatabaseThread>();
 
-        for (int i = 0; i < numThreads; i++){
-            String threadName = "thread"+i;
+        for (int i = 0; i < numThreads; i++) {
+            String threadName = "thread" + i;
             threadArray.add(new DatabaseThread(threadName, fullUrl, selectedRecordInfo, machineID, (byte) i, testLength));
             threadArray.get(i).start();
-            System.out.println("Thread started");            
-             
+            System.out.println("Thread started");
+
         }
 
         /*
@@ -73,27 +73,26 @@ public class LoadDriver{
         */
 
 
-        while (true){
+        while (true) {
 
             int doneThreads = 0;
-            for(int i = 0; i < threadArray.size(); i++){
+            for (int i = 0; i < threadArray.size(); i++) {
                 // If the thread is dead, add it to done threads
-                if (!threadArray.get(i).isAlive()){
+                if (!threadArray.get(i).isAlive()) {
                     doneThreads ++;
                 }
             }
 
-            if (doneThreads == numThreads){
+            if (doneThreads == numThreads) {
                 break;
             }
 
             // Check in 10 seconds
-            try{ 
-                Thread.sleep(1000*10);
-            }
-            catch (Exception e){
-                System.err.println("ERROR: LoadDriver: Exception "+ 
-                                "thrown trying to call Thread.sleep");
+            try {
+                Thread.sleep(1000 * 10);
+            } catch (Exception e) {
+                System.err.println("ERROR: LoadDriver: Exception " +
+                                   "thrown trying to call Thread.sleep");
                 System.err.println(e.toString());
             }
         }
@@ -101,12 +100,12 @@ public class LoadDriver{
         // Threads should have ended
         TransactionInfo txnInfo = threadArray.get(0).getTransactionInfo();
 
-        for (int i = 1; i < threadArray.size(); i++ ){
+        for (int i = 1; i < threadArray.size(); i++ ) {
             txnInfo.combine(threadArray.get(i).getTransactionInfo());
-        }        
+        }
 
         txnInfo.setTag(testType);
-        txnInfo.toJsonFile(testType+"Info1.json", testType+"Info2.json");
+        txnInfo.toJsonFile(testType + "Info1.json", testType + "Info2.json");
 
     }
 }
