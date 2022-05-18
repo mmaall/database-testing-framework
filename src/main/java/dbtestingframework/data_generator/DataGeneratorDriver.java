@@ -12,7 +12,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import data_generator.InvalidValueException;
-import data_generator.StringGenerator;
+import data_generator.helpers.StringGenerator;
 import data_generator.UniqueIDGenerator;
 
 class DataGeneratorDriver {

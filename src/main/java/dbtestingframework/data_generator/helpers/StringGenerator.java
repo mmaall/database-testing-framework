@@ -1,5 +1,5 @@
 
-package data_generator;
+package data_generator.helpers;
 
 import java.lang.Math;
 
