@@ -64,6 +64,7 @@ public class TransactionInfo {
 
     }
 
+    // Epochs are measured on a minute by minute thing 
     public TransactionInfo(long startTime, int numEpochs) {
         this.startTime = startTime;
         this.numEpochs = numEpochs;
@@ -81,7 +82,7 @@ public class TransactionInfo {
         //System.out.println(epoch);
         if (numEpochs <= epoch) {
             System.err.println("ERROR: TransactionInfo: Epoch " + epoch +
-                               "for txn starting at " +
+                               " for txn starting at " +
                                txnStartTime + "exceeds number of valid epochs");
             return;
         }

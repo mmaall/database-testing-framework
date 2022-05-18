@@ -7,6 +7,8 @@ public class DataGeneratorTest {
     
     public static void main(String[] args){
 
+        int totalRecords = 24;
+
         DynamoClient ddbClient = new DynamoClient("RandomTestTable", "GSI1", "us-east-1");
 
         int[] weights = {33,33,33};
@@ -20,6 +22,8 @@ public class DataGeneratorTest {
             System.err.println(e.getDetails());
         }
 
-        generator.run(15);
+        int recordsCreated = generator.run(totalRecords);
+
+        System.out.println(recordsCreated + " records created on the goal of " + totalRecords);
     }
 }

@@ -25,9 +25,9 @@ import ordersapp.*;
 // This aims to be an acceptable single table design using ddb
 public class DynamoClient implements DatabaseClient {
 
-    private String tableName;
-    private String indexName;
-    private AmazonDynamoDB ddb;
+    protected String tableName;
+    protected String indexName;
+    protected AmazonDynamoDB ddb;
 
     public DynamoClient() {
 
@@ -222,7 +222,7 @@ public class DynamoClient implements DatabaseClient {
     }
 
     // Converts the attribute map that ddb returns into an item that we care about 
-    private Item parseItemResult(Map<String, AttributeValue> attributeMap){
+    protected Item parseItemResult(Map<String, AttributeValue> attributeMap){
 
         if (attributeMap == null){
             return null;
@@ -240,30 +240,30 @@ public class DynamoClient implements DatabaseClient {
 
     // Helper Functions
 
-    private String getCustomerPK(long uid) {
+    protected String getCustomerPK(long uid) {
         return "customer#" + String.valueOf(uid);
     }
-    private String getCustomerSK(long uid) {
+    protected String getCustomerSK(long uid) {
         return getCustomerPK(uid);
     }
 
-    private long parseCustomerPK(String pk) {
+    protected long parseCustomerPK(String pk) {
         return Long.parseLong(stripKeyHeader(pk));
     }
-    private long parseCustomerSK(String sk) {
+    protected long parseCustomerSK(String sk) {
         return parseCustomerPK(sk);
     }
 
-    private String getOrderSK(long uid) {
+    protected String getOrderSK(long uid) {
         return "order#" + String.valueOf(uid);
     }
 
-    private String getItemSK(long uid){
+    protected String getItemSK(long uid){
         return "item#" + String.valueOf(uid);
     }
 
     // Get the string after the # for dynamodb primary keys
-    private String stripKeyHeader(String key) {
+    protected String stripKeyHeader(String key) {
         return key.substring(key.indexOf("#")+1);
     }
 }
