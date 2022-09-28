@@ -64,7 +64,7 @@ public class TransactionInfo {
 
     }
 
-    // Epochs are measured on a minute by minute thing 
+    // Epochs are measured on a minute by minute thing. This might need to clarified
     public TransactionInfo(long startTime, int numEpochs) {
         this.startTime = startTime;
         this.numEpochs = numEpochs;

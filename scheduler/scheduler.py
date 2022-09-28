@@ -316,6 +316,8 @@ class InfrastructureStack():
 
         file_parser.close()
 
+    # asks a user whether to proceed or not 
+    # waits for an answer from stdin 
     def can_continue(self) -> bool:
 
         while (True):

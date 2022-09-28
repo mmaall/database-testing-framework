@@ -8,11 +8,15 @@ import java.lang.Math;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.util.Date;
+import java.util.UUID;
+
 
 import ordersapp.dbclients.DatabaseClient;
 import ordersapp.dbclients.DatabaseClientException;
+import ordersapp.*;
 import data_generator.DataGenerator;
-
+import data_generator.helpers.StringGenerator;
 
 public class DatabaseThread extends Thread {
 
@@ -43,6 +47,10 @@ public class DatabaseThread extends Thread {
 
     }
 
+
+    // TODO: Can extract a lot of the timing code into a single
+    // method. Pass in method to invoke and args andtime 
+    // the operation 
     public void run() {
         System.out.println("Running " + threadName);
 
@@ -66,7 +74,6 @@ public class DatabaseThread extends Thread {
         System.out.println("Transactions starting");
         // Run this thread for the predetirmined amount of time.
         while (System.currentTimeMillis() < threadEndTime) {
-            System.out.println("Executing transaction");
             // Let's start executing queries
 
             // Generate a number between 1 and 100
@@ -74,10 +81,8 @@ public class DatabaseThread extends Thread {
 
 
             // Get a customers information 
-            if (randomInt < 30) {
-                System.out.println("Get customer info");
+            if (randomInt < 40) {
 
-                // Prepare
                 long customerUID = customerStartUID + ((int) Math.random() * totalCustomers);
 
                 long txnStartTime = System.currentTimeMillis();
@@ -92,7 +97,117 @@ public class DatabaseThread extends Thread {
                 
                 txnInfo.addTransaction(txnStartTime, txnEndTime);
                 long txnTime = txnEndTime - txnStartTime;
-                System.out.println("Transaction time: " +txnTime);
+                totalTransactionTime += txnTime;
+                numTransactions++;
+
+            } else if (randomInt < 80) {
+                // get recentItems
+
+
+                long customerUID = customerStartUID + ((int) Math.random() * totalCustomers);
+                Date now = new Date();
+
+                long txnStartTime = System.currentTimeMillis();
+
+                try{
+                    dbClient.getRecentItems(customerUID, now);
+                } catch (DatabaseClientException e){
+                    System.err.println(e.getDetails());
+                }
+
+                long txnEndTime = System.currentTimeMillis();
+                
+                txnInfo.addTransaction(txnStartTime, txnEndTime);
+                long txnTime = txnEndTime - txnStartTime;
+                totalTransactionTime += txnTime;
+                numTransactions++;
+
+
+            } else if (randomInt < 95){
+                // create an order with some items
+
+                int maxItems = 5;
+
+                // Construct objects to be written
+                long orderUID = UUID.randomUUID().getLeastSignificantBits();
+                long customerUID = customerStartUID + ((int) Math.random() * totalCustomers);
+                Date currentTime = new Date();
+                Order newOrder = new Order(
+                    orderUID,
+                    customerUID,
+                    currentTime,
+                    StringGenerator.generateAlphaNumeric(40, 5)
+                    );
+
+                Item[] items = new Item[maxItems];
+                int itemWriteCount = (int) Math.random() * maxItems; 
+
+                for(int i = 0; i < itemWriteCount; i++) {
+                    long itemUID = UUID.randomUUID().getLeastSignificantBits(); 
+                    items[i] = new Item(
+                        itemUID,
+                        orderUID,
+                        customerUID,
+                        (int) Math.random()*5,
+                        currentTime
+                        );
+                }
+
+                // Run the writes
+                long txnStartTime = System.currentTimeMillis();
+
+                try{
+                    dbClient.createOrder(newOrder);
+                } catch (DatabaseClientException e){
+                    System.err.println(e.getDetails());
+                }
+
+                long txnEndTime = System.currentTimeMillis();
+                
+                txnInfo.addTransaction(txnStartTime, txnEndTime);
+                long txnTime = txnEndTime - txnStartTime;
+                totalTransactionTime += txnTime;
+                numTransactions++;
+
+                // Write items if necessary 
+                for (int i = 0; i < itemWriteCount; i++){
+                    txnStartTime = System.currentTimeMillis();
+
+                    try{
+                        dbClient.createItem(items[i]);
+                    } catch (DatabaseClientException e){
+                        System.err.println(e.getDetails());
+                    }
+
+                    txnEndTime = System.currentTimeMillis();
+                    
+                    txnInfo.addTransaction(txnStartTime, txnEndTime);
+                    txnTime = txnEndTime - txnStartTime;
+                    totalTransactionTime += txnTime;
+                    numTransactions++; 
+                } 
+
+            } else {
+                // create a new customer
+
+                Customer newCustomer = new Customer(
+                        UUID.randomUUID().getLeastSignificantBits(),
+                        StringGenerator.generateAlphaNumeric(14, 2)
+                    );
+                newCustomer.addAddress(StringGenerator.generateAlphaNumeric(40,10));
+
+                long txnStartTime = System.currentTimeMillis();
+
+                try{
+                    dbClient.createCustomer(newCustomer);
+                } catch (DatabaseClientException e){
+                    System.err.println(e.getDetails());
+                }
+
+                long txnEndTime = System.currentTimeMillis();
+                
+                txnInfo.addTransaction(txnStartTime, txnEndTime);
+                long txnTime = txnEndTime - txnStartTime;
                 totalTransactionTime += txnTime;
                 numTransactions++;
 
@@ -115,23 +230,5 @@ public class DatabaseThread extends Thread {
 
     public TransactionInfo getTransactionInfo() {
         return txnInfo;
-    }
-
-    /**
-    * Borrowed this from the internet
-    * Wasn't in the mood to write it myself. Thanks internet, you do great.
-    * src: https://www.logicbig.com/how-to/code-snippets/jcode-java-random-random-dates.html
-    *
-    **/
-
-    public static int createRandomIntBetween(int start, int end) {
-        return start + (int) Math.round(Math.random() * (end - start));
-    }
-
-    public static LocalDate createRandomDate(int startYear, int endYear) {
-        int day = createRandomIntBetween(1, 28);
-        int month = createRandomIntBetween(1, 12);
-        int year = createRandomIntBetween(startYear, endYear);
-        return LocalDate.of(year, month, day);
     }
 }

@@ -4,20 +4,25 @@ import load_generator.DatabaseThread;
 import load_generator.TransactionInfo;
 import data_generator.DataGenerator;
 import data_generator.DataGeneratorException;
-import ordersapp.dbclients.DynamoClient;
+import ordersapp.dbclients.*;
 
 
 public class ThreadTester {
 
     public static void main(String[] args){
 
-        int totalRecords = 24;
+        int totalRecords = 10000;
+        int testDuration = 15;
+        String tableName = "DynamoDBIndexTestTable";
+        String gsiName = "customerUID-orderDate-index";
+        String region = "us-east-1";
+        String outputFile ="test-without-indexes";
 
-        DynamoClient ddbClient = new DynamoClient("RandomTestTable", "GSI1", "us-east-1");
+        DynamoClientScan ddbClient = new DynamoClientScan(tableName, gsiName, region);
 
 
         // Generate some data
-        int[] weights = {33,33,33};
+        int[] weights = {25,35,40};
         long[] startingUIDs = {0,0,0};
 
         DataGenerator generator = null;
@@ -35,14 +40,14 @@ public class ThreadTester {
 
         // Run a database thread 
         System.out.println("Load Testing");
-        DatabaseThread dbThread1 = new DatabaseThread("thread1", ddbClient, generator, 1000 * 60 * 5);
+        DatabaseThread dbThread1 = new DatabaseThread("thread1", ddbClient, generator, 1000 * 60 * testDuration);
         dbThread1.start();
 
         // Sleep wait while the thread is still running 
         while(dbThread1.isAlive()){
 
             try{
-                Thread.sleep(1000*1);
+                Thread.sleep(1000 * 30);
             } catch (Exception e){
                  System.err.println("ERROR: LoadDriver: Exception "+ 
                                 "thrown trying to call Thread.sleep");
@@ -52,8 +57,8 @@ public class ThreadTester {
 
         TransactionInfo txnInfo = dbThread1.getTransactionInfo();
 
-        txnInfo.setTag("Michael's test");
-        txnInfo.toJsonFile("simple-test.json", "simple-test-all.json");
+        txnInfo.setTag(outputFile);
+        txnInfo.toJsonFile(outputFile+".json", outputFile +"-all.json");
 
     }
 
